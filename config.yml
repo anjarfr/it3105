@@ -1,0 +1,14 @@
+board:
+  shape: diamond #triangle
+  size: 5
+
+game:
+  type: PEG
+  open_cells: 1
+
+RL_system:
+  episodes: 1000
+  critic: table #NN
+
+
+
