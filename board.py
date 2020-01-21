@@ -9,6 +9,7 @@ class Board:
     def create_board(self):
         return None
 
+
 class Triangle(Board):
     
     def __init__(self, size):
