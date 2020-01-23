@@ -36,9 +36,17 @@ def set_cell(board, r, c, state):
 def get_cell_coord(board):
     return list(zip(*np.where(board != None)))
 
-def get_neighbors(board, r, c):
-    pass
-
+def get_neighbors_triangle(board, r, c):
+    neighbors = [
+                (r-1, c-1), (r-1,c),
+                (r, c-1), (r, c+1),
+                (r+1, c), (r+1, c+1)
+            ]            
+    for cell in neighbors:
+        if cell[0] < 0 or cell[0] > board.size or cell[1] < 0 or cell[1] > cell[0]:
+            neighbors.remove(cell)
+    return neighbors
+        
 
 class Cell:
     """
