@@ -49,7 +49,3 @@ class Cell:
 
     def set_state(self, state):
         self.state = state
-
-
-#b = Board(cfg['board']['shape'], cfg['board']['size'])
-#print(b.board)

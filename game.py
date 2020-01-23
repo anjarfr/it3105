@@ -4,28 +4,42 @@ from board import create_board, set_cell
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
+
 class Game:
-    pass
+
+    def __init__(self):
+        self.board = create_board(cfg['board']['shape'], cfg['board']['size'])
+    
+    def terminal_print(self):
+        for row in self.board:
+            for cell in row:
+                print(cell.state) if cell != None else print(cell)
+
 
 class Peg(Game):
-     
-    def __init__(self, open_positions: list, k: int=1):
-        self.k = k
-        self.board = self.init_board(open_positions)
-
-    def init_board(self, open_positions: list):
-        board = create_board(cfg['board']['shape'], cfg['board']['size'])
+    
+    def __init__(self):
+        super(Peg, self).__init__()
+        self.open_positions = cfg['game']['open_positions']
+        self.board = self.place_pieces(self.board, self.open_positions)
+        
+    def place_pieces(self, board: object, open_positions):
         for r in range(board.size):
             for c in range(board.size):
-                coordinate = (r, c)
-                if coordinate in open_positions:
-                    continue
-                set_cell(board, r, c, (0,1))
+                coordinate = [r, c]
+                if coordinate not in open_positions:
+                   set_cell(board, r, c, (0,1))
         return board
-        
-    def place_pieces(self, board: object):
-        pass
 
 
-p = Peg(cfg['game']['open_positions'], cfg['game']['open_cells'])
-print(p.board)
+class Hex(Game):
+    pass
+
+def main():
+    game_type = cfg['game']['type']
+    if game_type == 'Peg': game = Peg()
+    if game_type == 'Hex': game = Hex()
+    game.terminal_print()
+
+if __name__ == '__main__':
+    main()
