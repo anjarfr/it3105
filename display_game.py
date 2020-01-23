@@ -1,5 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
+from board import get_cell_coord
 
 
 def display_game_board(board, size, shape):
@@ -9,17 +10,13 @@ def display_game_board(board, size, shape):
         'cmap':  plt.cm.Blues
         }
 
-    #nodes = board.get_cell_coord(board)
-    nodes = [*range(0, int((size*size + size) / 2), 1)]
+    nodes = get_cell_coord(board)
+    #nodes = [*range(0, int((size*size + size) / 2), 1)]
     positions = {}
-    counter = 0
 
     for i in range(size + 1):
         for j in range(-i, i, 2):
-            positions[counter] = [size+j, size-i]
-            counter += 1
-
-    print(positions)
+            positions[nodes.pop(0)] = [size+j, size-i]
 
     plt.figure(figsize=(10, 10))
     G = nx.Graph()
@@ -29,7 +26,7 @@ def display_game_board(board, size, shape):
     # Color nodes (filled / empty)
     color_map = []
     for node in G:
-        if node < 10:
+        if node:
             color_map.append('lightBlue')
         else:
             color_map.append('lightGreen')
@@ -42,4 +39,3 @@ def display_game_board(board, size, shape):
     # plt.savefig("path.png")
 
 
-display_game_board("board", 5, "triangle")

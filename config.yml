@@ -1,5 +1,5 @@
 board:
-  size: 5
+  size: 3
   shape: triangle
 
 game:
