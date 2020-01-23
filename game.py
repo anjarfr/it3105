@@ -1,5 +1,5 @@
 import yaml
-from board import create_board, set_cell
+from board import create_board, set_cell, get_cell_coord
 
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -39,7 +39,10 @@ def main():
     game_type = cfg['game']['type']
     if game_type == 'Peg': game = Peg()
     if game_type == 'Hex': game = Hex()
-    game.terminal_print()
+    #game.terminal_print()
+    print(get_cell_coord(game.board))
+    
 
 if __name__ == '__main__':
     main()
+    #triangle_coordinates(8)

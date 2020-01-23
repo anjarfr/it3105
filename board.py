@@ -33,6 +33,12 @@ def set_cell(board, r, c, state):
     except:
         pass
 
+def get_cell_coord(board):
+    return list(zip(*np.where(board != None)))
+
+def get_neighbors(board, r, c):
+    pass
+
 
 class Cell:
     """
@@ -49,3 +55,5 @@ class Cell:
 
     def set_state(self, state):
         self.state = state
+
+
