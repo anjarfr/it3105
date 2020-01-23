@@ -1,5 +1,5 @@
 import yaml
-from board import Board
+from board import create_board, set_cell
 
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -14,14 +14,13 @@ class Peg(Game):
         self.board = self.init_board(open_positions)
 
     def init_board(self, open_positions: list):
-        board = Board(cfg['board']['shape'], cfg['board']['size'])
+        board = create_board(cfg['board']['shape'], cfg['board']['size'])
         for r in range(board.size):
             for c in range(board.size):
                 coordinate = (r, c)
                 if coordinate in open_positions:
                     continue
-
-                board.set_cell(r, c, (0,1))
+                set_cell(board, r, c, (0,1))
         return board
         
     def place_pieces(self, board: object):
@@ -29,4 +28,4 @@ class Peg(Game):
 
 
 p = Peg(cfg['game']['open_positions'], cfg['game']['open_cells'])
-print(p.board.board)
+print(p.board)

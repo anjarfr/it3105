@@ -4,41 +4,34 @@ import yaml
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-class Board:
-
-    def __init__(self, shape, size=3):
-        self.size = size
-        self.shape = shape
-        self.board = self.create_board(shape)
-
-    def create_board(self, shape):
-        if self.shape == 'triangle':
-            return self.create_triangle(self.size)
-        if self.shape == 'diamond':
-            return self.create_diamond(self.size)
-
-    def create_triangle(self, size):
-        board = np.empty((size, size), dtype='object')
-        iterator = 1
-        while iterator != size + 1:
-            for row in board:
-                for i in range(iterator):
-                    row[i] = Cell((0,0))
-                iterator += 1
-        return board
-
-    def create_diamond(self, size):
-        board = np.empty((size, size), dtype='object')
+def create_triangle(size):
+    board = np.empty((size, size), dtype='object')
+    iterator = 1
+    while iterator != size + 1:
         for row in board:
-            for i in range(row.size):
+            for i in range(iterator):
                 row[i] = Cell((0,0))
-        return board
+            iterator += 1
+    return board
 
-    def set_cell(self, r, c, state):
-        try:
-            self.board[r][c].set_state(state)
-        except:
-            pass
+def create_diamond(size):
+    board = np.empty((size, size), dtype='object')
+    for row in board:
+        for i in range(row.size):
+            row[i] = Cell((0,0))
+    return board
+
+def create_board(shape, size):
+    if shape == 'triangle':
+        return create_triangle(size)
+    if shape == 'diamond':
+        return create_diamond(size)
+
+def set_cell(board, r, c, state):
+    try:
+        board[r][c].set_state(state)
+    except:
+        pass
 
 
 class Cell:
