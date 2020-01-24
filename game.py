@@ -27,8 +27,8 @@ class Peg(Game):
         self.board = self.place_pieces(self.board, self.open_positions)
         
     def place_pieces(self, board: object, open_positions):
-        for r in range(board.size):
-            for c in range(board.size):
+        for r in range(self.size):
+            for c in range(self.size):
                 coordinate = [r, c]
                 if coordinate not in open_positions:
                    set_cell(board, r, c, (0,1))

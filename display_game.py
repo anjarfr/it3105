@@ -5,10 +5,9 @@ from board import get_cell_coord, get_neighbors_triangle
 
 def display_game_board(board, size, shape):
     options = {
-        'node_size': 1000,
+        'node_size': 100,
         'node_color': 'black',
         }
-
 
     G = nx.Graph()
 
@@ -24,12 +23,10 @@ def display_game_board(board, size, shape):
 
     edges = []
     for node in nodes:
-        neighbors = get_neighbors_triangle(board, node[0], node[1])
-        print('Node ', node)
-        print(neighbors)
+        neighbors = get_neighbors_triangle(board, size, node[0], node[1])
         edges += [(node, x) for x in neighbors]
 
-    #print(edges)
+    G.add_edges_from(edges)
 
     plt.figure(figsize=(10, 10))
 
