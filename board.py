@@ -43,7 +43,7 @@ def get_neighbors_triangle(board, r, c):
                 (r+1, c), (r+1, c+1)
             ]            
     for cell in neighbors:
-        if cell[0] < 0 or cell[0] > board.size or cell[1] < 0 or cell[1] > cell[0]:
+        if (cell[0] < 0) or (cell[0] > board.size) or (cell[1] < 0) or (cell[1] > cell[0]):
             neighbors.remove(cell)
     return neighbors
         
