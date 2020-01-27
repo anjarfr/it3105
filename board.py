@@ -4,6 +4,7 @@ import yaml
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
+
 def create_triangle(size):
     board = np.empty((size, size), dtype='object')
     iterator = 1
@@ -14,6 +15,7 @@ def create_triangle(size):
             iterator += 1
     return board
 
+
 def create_diamond(size):
     board = np.empty((size, size), dtype='object')
     for row in board:
@@ -21,11 +23,13 @@ def create_diamond(size):
             row[i] = Cell((0,0))
     return board
 
+
 def create_board(shape, size):
     if shape == 'triangle':
         return create_triangle(size)
     if shape == 'diamond':
         return create_diamond(size)
+
 
 def set_cell(board, r, c, state):
     try:
@@ -33,20 +37,38 @@ def set_cell(board, r, c, state):
     except:
         pass
 
+
 def get_cell_coord(board):
     return list(zip(*np.where(board != None)))
 
-def get_neighbors_triangle(board, r, c):
-    neighbors = [
-                (r-1, c-1), (r-1,c),
-                (r, c-1), (r, c+1),
-                (r+1, c), (r+1, c+1)
-            ]            
-    for cell in neighbors:
-        if cell[0] < 0 or cell[0] > board.size or cell[1] < 0 or cell[1] > cell[0]:
-            neighbors.remove(cell)
+
+def get_neighbors_triangle(board, size, shape, r, c):
+    tmp = [ (r-1, c-1), (r-1, c),
+            (r, c-1),   (r, c+1),
+            (r+1, c),   (r+1, c+1) ]
+    neighbors = []          
+    for cell in tmp:
+        row = cell[0]
+        col = cell[1]
+        if row < 0 or row > size-1 or col < 0 or col > row:
+            continue
+        neighbors.append(cell)    
     return neighbors
-        
+
+
+def get_neighbors_diamond(board, size, shape, r, c):
+    tmp = [ (r-1, c),   (r-1, c+1), 
+            (r, c-1),   (r, c+1),
+            (r+1, c-1), (r+1, c) ]
+    neighbors = []          
+    for cell in tmp:
+        row = cell[0]
+        col = cell[1]
+        if row < 0 or row > size-1 or col < 0 or col > size-1:
+            continue
+        neighbors.append(cell)    
+    return neighbors
+
 
 class Cell:
     """

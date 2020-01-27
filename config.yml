@@ -1,6 +1,6 @@
 board:
-  size: 3
-  shape: triangle
+  size: 5
+  shape: diamond
 
 game:
   type: Peg
