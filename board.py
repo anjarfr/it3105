@@ -104,4 +104,4 @@ class Cell:
 
     def is_filled(self):
         return self.state != (0, 0)
-
+        

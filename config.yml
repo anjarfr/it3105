@@ -11,5 +11,11 @@ RL_system:
   episodes: 1000
   critic: table #NN
 
+display:
+  node_size: 1500
+  initial_color: 'white'
+  filled_color: 'plum'
+
+
 
 
