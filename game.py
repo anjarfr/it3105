@@ -1,6 +1,5 @@
 import yaml
-from board import create_board, set_cell, get_cell_coord, get_neighbors_triangle
-from display_game import display_game_board
+from board import create_board, set_cell, get_neighbors_triangle
 
 with open("config.yml", 'r') as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
