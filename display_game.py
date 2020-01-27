@@ -32,7 +32,7 @@ def display_game_board(board, size, shape):
 
     edges = []
     for node in nodes:
-        neighbors = board.get_neighbors(shape, size, node[0], node[1])
+        neighbors = board.get_neighbors(size, node[0], node[1])
         edges += [(node, x) for x in neighbors]
 
     G.add_edges_from(edges)

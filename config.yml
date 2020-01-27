@@ -1,11 +1,11 @@
 board:
-  size: 5
+  size: 4
   shape: diamond
 
 game:
   type: Peg
   open_cells: 1
-  open_positions: [[0,0], [1,0], [2,1], [2,2]]
+  open_positions: [[0,0], [1,0]]
 
 RL_system:
   episodes: 1000

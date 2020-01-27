@@ -9,14 +9,21 @@ class Board:
     def create_board(self, size):
         pass
 
-    def set_cell(self, board, r, c, state):
+    def set_cell(self, r, c, state):
         try:
             self.cells[r][c].set_state(state)
         except:
             pass
 
     def get_cell_coord(self):
-        return list(zip(*np.where(self.board != None)))
+        return list(zip(*np.where(self.cells != None)))
+
+    def get_filled_cells(self):
+        filled = []
+        for row in self.cells:
+            for cell in row:
+                if cell.is_filled(): filled.append(cell.coordinates)
+        return filled
 
 
 class Triangle(Board):
@@ -28,9 +35,9 @@ class Triangle(Board):
         cells = np.empty((size, size), dtype='object')
         iterator = 1
         while iterator != size + 1:
-            for row in cells:
-                for i in range(iterator):
-                    row[i] = Cell((0,0))
+            for row in range(size):
+                for col in range(iterator):
+                    cells[row][col] = Cell((0,0), (row, col))
                 iterator += 1
         return cells
 
@@ -42,13 +49,12 @@ class Triangle(Board):
         for cell in tmp:
             row = cell[0]
             col = cell[1]
-            if self.is_illegal_cell(row, col):
-                continue
-            neighbors.append(cell)    
+            if self.is_legal_cell(row, col):
+                neighbors.append(cell)    
         return neighbors
 
-    def is_illegal_cell(self, row, col):
-        return row < 0 or row > self.size-1 or col < 0 or col > row
+    def is_legal_cell(self, row, col):
+        return not (row < 0 or row > self.size-1 or col < 0 or col > row)
 
     
 class Diamond(Board):
@@ -58,9 +64,9 @@ class Diamond(Board):
 
     def create_board(self, size):
         cells = np.empty((size, size), dtype='object')
-        for row in cells:
-            for i in range(row.size):
-                row[i] = Cell((0,0))
+        for row in range(size):
+            for col in range(size):
+                cells[row][col] = Cell((0,0), (row, col))
         return cells
 
     def get_neighbors(self, size, r, c):
@@ -71,13 +77,12 @@ class Diamond(Board):
         for cell in tmp:
             row = cell[0]
             col = cell[1]
-            if self.is_illegal_cell(row, col):
-                continue
-            neighbors.append(cell)
+            if self.is_legal_cell(row, col):
+                neighbors.append(cell)
         return neighbors
 
-    def is_illegal_cell(self, row, col):
-        return row < 0 or row > self.size-1 or col < 0 or col > self.size-1
+    def is_legal_cell(self, row, col):
+        return not (row < 0 or row > self.size-1 or col < 0 or col > self.size-1)
 
 
 class Cell:
@@ -86,9 +91,10 @@ class Cell:
     3 values: (0,0) - emtpy, (0,1) - player 1, (1,0) - player 2
     """
     
-    def __init__(self, state):  
+    def __init__(self, state, coordinates):  
         self.state = state
         self.visited = False
+        self.coordinates = coordinates
     
     def set_visited(self, visited):
         self.visited = visited

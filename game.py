@@ -20,7 +20,7 @@ class Game:
     def terminal_print(self):
         for row in self.board.cells:
             for cell in row:
-                print(cell.state) if cell != None else print(cell)
+                print(cell.state, cell.coordinates) if cell != None else print(cell)
 
 
 class Peg(Game):
@@ -36,27 +36,36 @@ class Peg(Game):
             for c in range(self.size):
                 coordinate = [r, c]
                 if coordinate not in open_positions:
-                   self.board.set_cell(board, r, c, (0,1))
+                   self.board.set_cell(r, c, (0,1))
         return board
 
     def get_legal_actions(self, r, c):
         # returns all legal moves for the peg in the specified coordinate (r, c)
-        legal_moves = []
+        
+        legal_moves = {}
         neighbors = self.board.get_neighbors(self.size, r, c)
+
         for node in neighbors:
-            cell = self.board.cells[r][c]
-            if cell.is_filled:
+            row = node[0]
+            col = node[1]
+            cell = self.board.cells[row][col]
+            # for all neighboring cells that are filled
+            if cell != None and cell.is_filled():
+                # find the possible cell to jump to
                 row_diff, col_diff = (node[0] - r, node[1] - c)
                 target_row, target_col = r + 2*row_diff, c + 2*col_diff
-                target_cell = self.board.cells[target_row][target_col]
-                if not target_cell.is_filled:
-                    legal_moves.append(target_cell)
+                if self.board.is_legal_cell(target_row, target_col):
+                    target_cell = self.board.cells[target_row][target_col]
+                    # if that cell is empty
+                    if not target_cell.is_filled():
+                        # the peg can jump here!
+                        legal_moves[(target_row, target_col)] = target_cell
         return legal_moves
             
-    def act(self, start, end):
+    def perform_action(self, start, end):
         # perform the action chosen by Actor/Critic
-        pass
-
+        self.board.set_cell(start[0], start[1], (0,0))
+        self.board.set_cell(end[0], end[1], (0,1))
     
 
 
