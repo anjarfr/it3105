@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from board import get_cell_coord, get_neighbors
 
 
 def display_game_board(board, size, shape):
@@ -11,7 +10,7 @@ def display_game_board(board, size, shape):
 
     G = nx.Graph()
 
-    nodes = get_cell_coord(board)
+    nodes = board.get_cell_coord()
     G.add_nodes_from(nodes)
 
     positions = {}
@@ -33,7 +32,7 @@ def display_game_board(board, size, shape):
 
     edges = []
     for node in nodes:
-        neighbors = get_neighbors(shape, size, node[0], node[1])
+        neighbors = board.get_neighbors(shape, size, node[0], node[1])
         edges += [(node, x) for x in neighbors]
 
     G.add_edges_from(edges)

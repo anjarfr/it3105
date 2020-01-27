@@ -1,5 +1,5 @@
 import yaml
-from board import create_board, set_cell, get_cell_coord, get_neighbors_triangle
+from board import Triangle, Diamond
 from display_game import display_game_board
 
 with open("config.yml", 'r') as ymlfile:
@@ -11,10 +11,14 @@ class Game:
     def __init__(self):
         self.size = cfg['board']['size']
         self.shape = cfg['board']['shape']
-        self.board = create_board(self.shape, self.size)
+
+        if self.shape == 'triangle':
+            self.board = Triangle(self.size)
+        if self.shape == 'diamond':
+            self.board = Diamond(self.size)
     
     def terminal_print(self):
-        for row in self.board:
+        for row in self.board.cells:
             for cell in row:
                 print(cell.state) if cell != None else print(cell)
 
@@ -32,18 +36,23 @@ class Peg(Game):
             for c in range(self.size):
                 coordinate = [r, c]
                 if coordinate not in open_positions:
-                   set_cell(board, r, c, (0,1))
+                   self.board.set_cell(board, r, c, (0,1))
         return board
 
-    def get_legal_actions(self, coord: tuple, peg: object):
-        # returns all legal moves for the specified peg
-        filled = []
-        moves = []
-        neighbors = get_neighbors_triangle
+    def get_legal_actions(self, r, c):
+        # returns all legal moves for the peg in the specified coordinate (r, c)
+        legal_moves = []
+        neighbors = self.board.get_neighbors(self.size, r, c)
+        for node in neighbors:
+            cell = self.board.cells[r][c]
+            if cell.is_filled:
+                row_diff, col_diff = (node[0] - r, node[1] - c)
+                target_row, target_col = r + 2*row_diff, c + 2*col_diff
+                target_cell = self.board.cells[target_row][target_col]
+                if not target_cell.is_filled:
+                    legal_moves.append(target_cell)
+        return legal_moves
             
-
-        pass
-
     def act(self, start, end):
         # perform the action chosen by Actor/Critic
         pass
