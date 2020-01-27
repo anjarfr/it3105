@@ -42,7 +42,7 @@ def get_cell_coord(board):
     return list(zip(*np.where(board != None)))
 
 
-def get_neighbors_triangle(board, size, shape, r, c):
+def get_neighbors_triangle(size, r, c):
     tmp = [ (r-1, c-1), (r-1, c),
             (r, c-1),   (r, c+1),
             (r+1, c),   (r+1, c+1) ]
@@ -56,7 +56,7 @@ def get_neighbors_triangle(board, size, shape, r, c):
     return neighbors
 
 
-def get_neighbors_diamond(board, size, shape, r, c):
+def get_neighbors_diamond(size, r, c):
     tmp = [ (r-1, c),   (r-1, c+1), 
             (r, c-1),   (r, c+1),
             (r+1, c-1), (r+1, c) ]
@@ -68,6 +68,13 @@ def get_neighbors_diamond(board, size, shape, r, c):
             continue
         neighbors.append(cell)    
     return neighbors
+
+def get_neighbors(shape, size, r, c):
+    if shape == 'triangle':
+        return get_neighbors_triangle(size, r, c)
+    if shape == 'diamond':
+        return get_neighbors_diamond(size, r, c)
+    return None
 
 
 class Cell:

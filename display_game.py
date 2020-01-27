@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-from board import get_cell_coord, get_neighbors_triangle, get_neighbors_diamond
+from board import get_cell_coord, get_neighbors
 
 
 def display_game_board(board, size, shape):
@@ -33,10 +33,7 @@ def display_game_board(board, size, shape):
 
     edges = []
     for node in nodes:
-        if shape == 'triangle':
-            neighbors = get_neighbors_triangle(board, size, shape, node[0], node[1])
-        else:
-            neighbors = get_neighbors_diamond(board, size, shape, node[0], node[1])
+        neighbors = get_neighbors(shape, size, node[0], node[1])
         edges += [(node, x) for x in neighbors]
 
     G.add_edges_from(edges)

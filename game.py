@@ -20,6 +20,7 @@ class Game:
 
 
 class Peg(Game):
+    # All rules and legal actions related to the Peg game
     
     def __init__(self):
         super(Peg, self).__init__()
@@ -33,6 +34,21 @@ class Peg(Game):
                 if coordinate not in open_positions:
                    set_cell(board, r, c, (0,1))
         return board
+
+    def get_legal_actions(self, coord: tuple, peg: object):
+        # returns all legal moves for the specified peg
+        filled = []
+        moves = []
+        neighbors = get_neighbors_triangle
+            
+
+        pass
+
+    def act(self, start, end):
+        # perform the action chosen by Actor/Critic
+        pass
+
+    
 
 
 class Hex(Game):
