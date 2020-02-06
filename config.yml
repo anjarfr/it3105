@@ -15,6 +15,7 @@ display:
   node_size: 1500
   initial_color: 'white'
   filled_color: 'plum'
+  frequency: 0
 
 
 
