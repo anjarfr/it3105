@@ -5,7 +5,7 @@ board:
 game:
   type: Peg
   open_cells: 1
-  open_positions: [[0,0], [1,0]]
+  open_positions: [[2,1]]
 
 RL_system:
   episodes: 1000
