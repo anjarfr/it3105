@@ -1,6 +1,6 @@
 import yaml
 from copy import deepcopy
-from board import Triangle, Diamond
+from environment.board import Triangle, Diamond
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -39,6 +39,13 @@ class Peg(Game):
                 if coordinate not in open_positions:
                     self.board.set_cell(r, c, (0, 1))
         return board
+
+    def get_all_legal_actions(self):
+        # TODO
+        """
+        Return all possible legal actions from the board
+        """
+        pass
 
     def get_legal_actions(self, r: int, c: int):
         """
@@ -101,7 +108,7 @@ class Peg(Game):
         return len(self.board.get_filled_cells())
 
     def is_finished(self):
-        return self.get_pegs() == 0
+        return self.get_pegs() == 1
 
 
 class Hex(Game):
