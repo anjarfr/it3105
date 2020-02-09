@@ -33,10 +33,11 @@ class Peg(Game):
         self.board = self.place_pieces(self.board, self.open_positions)
 
     def place_pieces(self, board: object, open_positions):
+        """ Initialize all pegs """
         for r in range(self.size):
             for c in range(self.size):
                 coordinate = [r, c]
-                if coordinate not in open_positions:
+                if coordinate not in open_positions and self.board.is_legal_cell(r,c):
                     self.board.set_cell(r, c, (0, 1))
         return board
 

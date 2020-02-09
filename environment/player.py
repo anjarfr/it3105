@@ -42,6 +42,7 @@ class Player:
         Translate between actions of the form start, jump, end and action number
         """
 
+
 def main():
     game_type = cfg["game"]["type"]
     if game_type == "Peg":
@@ -49,14 +50,8 @@ def main():
     if game_type == "Hex":
         game = Hex()
 
-
     display_options = cfg["display"]
     visualizer = Visualizer(game.board, game.size, game.shape, display_options)
-    visualizer.fill_nodes(game.board.get_filled_cells())
-
-    game.perform_action((0, 3), (1, 2), (2, 1))
-    visualizer.fill_nodes(game.board.get_filled_cells())
-    game.perform_action((3, 0), (2, 1), (1, 2))
     visualizer.fill_nodes(game.board.get_filled_cells())
 
     for a in game.history:

@@ -2,7 +2,7 @@
 
 board:
   size: 4
-  shape: diamond #diamond
+  shape: triangle #diamond
 
 game:
   type: Peg #Hex

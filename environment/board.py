@@ -31,8 +31,9 @@ class Board:
         filled = []
         for row in self.cells:
             for cell in row:
-                if cell.is_filled():
-                    filled.append(cell.coordinates)
+                if cell != None:
+                    if cell.is_filled():
+                        filled.append(cell.coordinates)
         return filled
 
 
