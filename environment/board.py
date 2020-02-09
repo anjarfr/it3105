@@ -45,7 +45,6 @@ class Board:
                 if cell != None:
                     state.extend(cell.state)
         array = np.array(state)
-        print(array)
         return array
 
 

@@ -44,12 +44,12 @@ class Peg(Game):
     def get_legal_actions(self, r: int, c: int):
         """
         Returns all legal moves for the peg in the specified coordinate (r, c)
-        as a dictionary of the form:
-        (target coordinates): (target_cell, node_it_jumps_over)
+        as a list of coordinates the peg can jump to
         """
 
-        legal_moves = {}
-        neighbors = self.board.get_neighbors(self.size, r, c)
+        legal_actions = []
+
+        neighbors = self.board.get_neighbors(r, c)
 
         for node in neighbors:
             row = node[0]
@@ -67,13 +67,13 @@ class Peg(Game):
                 if self.board.is_legal_cell(target_row, target_col):
                     target_cell = self.board.cells[target_row][target_col]
 
-                    # If that cell is empty
+                    # If that cell is emptyhttps://stackoverflow.com/questions/8322534/typeerror-builtin-function-or-method-object-is-not-subscriptable
                     if not target_cell.is_filled():
 
                         # The peg can jump over node to get to target cell!
-                        legal_moves[(target_row, target_col)] = (target_cell, node)
+                        legal_actions.append((target_row, target_col))
 
-        return legal_moves
+        return legal_actions
 
     def search_legal_actions(self):
         # TODO
@@ -81,13 +81,14 @@ class Peg(Game):
         Return all possible legal actions from the board
         """
         legal_actions = {}
-        for row in self.board:
-            for col in row:
-                legal_actions[(row, col)]
+        for row in range(self.size):
+            for col in range(self.size):
+                actions = self.get_legal_actions(row, col)
+                if len(actions) > 0:
+                    legal_actions[(row, col)] = actions
+        return legal_actions
 
-        pass
-
-    def perform_action(self, start: tuple, jump: tuple, end: tuple):
+    def perform_action(self, start: tuple, end: tuple):
         """
         Perform the action chosen by Actor/Critic.
         Appends the previous board state to history.
@@ -98,6 +99,11 @@ class Peg(Game):
         self.history.append(self.board)
 
         self.board = deepcopy(self.board)
+
+        # Calculate which cell the peg jumps over
+        row_diff = start[0] - end[0]
+        col_diff = start[1] - end[1]
+        jump = (int(start[0] - row_diff / 2), int(start[1] - col_diff / 2))
 
         # Remove the peg in start position and the peg it jumps over
         self.board.set_cell(start[0], start[1], (0, 0))

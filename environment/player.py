@@ -54,7 +54,11 @@ def main():
     visualizer = Visualizer(game.board, game.size, game.shape, display_options)
     visualizer.fill_nodes(game.board.get_filled_cells())
 
+    game.perform_action((4, 2), (2, 0))
+    visualizer.fill_nodes(game.board.get_filled_cells())
+
     game.board.generate_state()
+    print(game.search_legal_actions())
 
 
 if __name__ == "__main__":

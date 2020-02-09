@@ -1,13 +1,13 @@
 # Environment parameters
 
 board:
-  size: 4
+  size: 8
   shape: triangle #diamond
 
 game:
   type: Peg #Hex
   open_cells: 1
-  open_positions: [[2,1]]
+  open_positions: [[2,0]]
 
 display:
   node_size: 1500
