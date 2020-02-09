@@ -1,8 +1,6 @@
 import yaml
-from environment.rules import Peg, Hex
-from environment.visualizer import Visualizer
-from agent.critic import Critic
-from agent.actor import Actor
+from rules import Peg, Hex
+from visualizer import Visualizer
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
