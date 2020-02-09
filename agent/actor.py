@@ -6,14 +6,19 @@ class Actor:
     Update policy based on TD error
     """
 
-    def __init__(self, cfg):
+    def __init__(self, init_state, cfg):
         self.policy = {}
+        self.eligibility = {}
 
     def choose_action(self, state, actions):
         """
-        Return state number (a1, a2, a3 etc)
+        Return chosen action
         """
-        pass
+        chosen_action = max(self.policy.get(state))
+        return chosen_action
+
+    def update_eligibility(self, state, action):
+        self.eligibility[(state, action)] = 1
 
     def produce_initial_state(self):
         pass
@@ -21,5 +26,3 @@ class Actor:
     def game_is_over(self):
         pass
 
-    def perform_action(self):
-        pass

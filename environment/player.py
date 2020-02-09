@@ -4,7 +4,7 @@ from environment.visualizer import Visualizer
 from agent.critic import Critic
 from agent.actor import Actor
 
-with open("config.yml", "r") as ymlfile:
+with open("../config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
@@ -20,8 +20,9 @@ class Player:
 
     def __init__(self):
         self.game = self.initialize_game()
-        self.actor = Actor(cfg)
-        self.critic = Critic(cfg)
+        self.init_state = self.game.board
+        self.actor = Actor(self.init_state, cfg)
+        self.critic = Critic(self.init_state, cfg)
 
     def initialize_game(self):
         game_type = cfg["game"]["type"]

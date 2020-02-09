@@ -2,7 +2,7 @@ import yaml
 from copy import deepcopy
 from environment.board import Triangle, Diamond
 
-with open("config.yml", "r") as ymlfile:
+with open("../config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
