@@ -23,6 +23,7 @@ The agent contains an actor and a critic, and is the learning part of the system
 * use epsilon-greedy strategy
 
 ##### And the critic should:
+* calculate the value updates of actions
 * contain two different implementations
     * Table implementation
     * Neural network implemented with either Tensorflow or PyTorch. 
