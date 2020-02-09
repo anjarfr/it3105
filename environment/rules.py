@@ -37,7 +37,7 @@ class Peg(Game):
         for r in range(self.size):
             for c in range(self.size):
                 coordinate = [r, c]
-                if coordinate not in open_positions and self.board.is_legal_cell(r,c):
+                if coordinate not in open_positions and self.board.is_legal_cell(r, c):
                     self.board.set_cell(r, c, (0, 1))
         return board
 
@@ -84,8 +84,6 @@ class Peg(Game):
         for row in self.board:
             for col in row:
                 legal_actions[(row, col)]
-
-
 
         pass
 

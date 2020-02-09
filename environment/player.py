@@ -54,10 +54,7 @@ def main():
     visualizer = Visualizer(game.board, game.size, game.shape, display_options)
     visualizer.fill_nodes(game.board.get_filled_cells())
 
-    for a in game.history:
-        print(a.get_filled_cells())
-
-    print(game.board.get_filled_cells())
+    game.board.generate_state()
 
 
 if __name__ == "__main__":
