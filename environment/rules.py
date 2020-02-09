@@ -40,13 +40,6 @@ class Peg(Game):
                     self.board.set_cell(r, c, (0, 1))
         return board
 
-    def get_all_legal_actions(self):
-        # TODO
-        """
-        Return all possible legal actions from the board
-        """
-        pass
-
     def get_legal_actions(self, r: int, c: int):
         """
         Returns all legal moves for the peg in the specified coordinate (r, c)
@@ -80,6 +73,20 @@ class Peg(Game):
                         legal_moves[(target_row, target_col)] = (target_cell, node)
 
         return legal_moves
+
+    def search_legal_actions(self):
+        # TODO
+        """
+        Return all possible legal actions from the board
+        """
+        legal_actions = {}
+        for row in self.board:
+            for col in row:
+                legal_actions[(row, col)]
+
+
+
+        pass
 
     def perform_action(self, start: tuple, jump: tuple, end: tuple):
         """
