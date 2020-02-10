@@ -75,7 +75,7 @@ class Peg(Game):
 
         return legal_actions
 
-    def search_legal_actions(self):
+    def get_all_legal_actions(self):
         # TODO
         """
         Return all possible legal actions from the board
@@ -86,7 +86,8 @@ class Peg(Game):
                 actions = self.get_legal_actions(row, col)
                 if len(actions) > 0:
                     legal_actions[(row, col)] = actions
-        self.legal_actions = legal_actions
+
+        return legal_actions
 
     def perform_action(self, start: tuple, end: tuple):
         """

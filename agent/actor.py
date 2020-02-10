@@ -9,7 +9,7 @@ class Actor:
     Update policy based on TD error
     """
 
-    def __init__(self, init_state, cfg):
+    def __init__(self, cfg):
         self.policy = {}
         self.alpha = cfg['actor']['learning_rate']
         self.delta = cfg['actor']['eligibility_decay']
