@@ -35,12 +35,11 @@ class Player:
         return game
 
     def play_game(self):
-        for i in range (self.episodes):
-            while not self.game.is_finished():  # add timeout
-                state = self.game.board
-                action = self.actor.choose_action(state, self.game.get_all_legal_actions())
-                succ_state, reward = self.game.perform_action(action)
-                self.critic.update_value_function(state, action, reward, succ_state)
+        while not self.game.is_finished():  # add timeout
+            state = self.game.board
+            action = self.actor.choose_action(state, self.game.get_all_legal_actions())
+            succ_state, reward = self.game.perform_action(action)
+            self.critic.update_value_function(state, action, reward, succ_state)
 
     def translate_actions(self, actions):
         """
