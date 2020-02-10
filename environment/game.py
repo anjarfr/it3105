@@ -67,7 +67,7 @@ class Peg(Game):
                 if self.board.is_legal_cell(target_row, target_col):
                     target_cell = self.board.cells[target_row][target_col]
 
-                    # If that cell is emptyhttps://stackoverflow.com/questions/8322534/typeerror-builtin-function-or-method-object-is-not-subscriptable
+                    # If that cell is empty
                     if not target_cell.is_filled():
 
                         # The peg can jump over node to get to target cell!
