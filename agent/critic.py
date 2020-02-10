@@ -10,7 +10,7 @@ class Critic:
         self.value_function = {}
         self.init_state = init_state
         self.eligibility = {}
-        self.visited_states = []
+        self.visited_SAP = []
 
         self.current_state = self.init_state
         self.current_action = None
@@ -25,21 +25,22 @@ class Critic:
         self.discount_factor = cfg["critic"]["discount_factor"]
 
     def initialize_value_function(self):
-        if not self.value_function.get((self.init_state, self.current_action)):
-            self.value_function[(self.init_state, self.current_action)] = 0
+        if not self.value_function.get((self.current_state, self.current_action)):
+            self.value_function[(self.current_state, self.current_action)] = 0
 
     def update_value_function(self):
-        self.value_function[(self.current_state, self.current_action)] += self.learning_rate * self.TD_error()
+        for state in self.visited_SAP:
+            self.value_function[state] += self.learning_rate * self.TD_error() * self.eligibility[state]
 
     def get_value(self, state, action):
         return self.value_function.get((state, action))
 
     def update_TD_error(self):
         self.TD_error = self.reward + self.discount_factor * self.get_value(self.succ_state, self.succ_action) \
-                        - self.get_value(self.state, self.action)
+                        - self.get_value(self.current_state, self.current_action)
 
     def update_eligibility(self):
-        for state in self.visited_states:
+        for state in self.visited_SAP:
             if state == self.current_state:
                 self.eligibility[state] = 1  # To avoid accumulating trace
             else:
@@ -51,9 +52,10 @@ class Critic:
         self.reward = reward
         self.succ_state = succ_state
         self.succ_action = None  # TODO Find best possible action (ask actor? Hmm, doesnt seem right)
+        self.visited_SAP.append((self.current_state, self.current_action))
 
-        TD_error = self.TD_error()
+        self.update_TD_error()
         self.update_value_function()
         self.update_eligibility()
 
-        return TD_error
+        return self.TD_error
