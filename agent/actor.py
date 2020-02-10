@@ -1,3 +1,6 @@
+import random
+
+
 class Actor:
 
     """
@@ -8,21 +11,45 @@ class Actor:
 
     def __init__(self, init_state, cfg):
         self.policy = {}
-        self.eligibility = {}
+        self.alpha = cfg['actor']['learning_rate']
+        self.delta = cfg['actor']['eligibility_decay']
+        self.gamma = cfg['actor']['discount_factor']
+        self.epsilon = cfg['actor']['init_epsilon']
+        self.epsilon_decay = cfg['actor']['epsilon_decay_rate']
+
+    def produce_initial_state(self, init_state, init_actions):
+        """ Initializes policy of inital state """
+        for action in init_actions:
+            self.policy[init_state, action] = 0
 
     def choose_action(self, state, actions):
         """
-        Return chosen action
+        Epsilon Greepy Policy for choosing action
+        Choose the best possible action with a probability 1-e,
+        and a random action with probability e
         """
-        chosen_action = max(self.policy.get(state))
-        return chosen_action
+        greedy_number = random.uniform(0, 1)
 
-    def update_eligibility(self, state, action):
-        self.eligibility[(state, action)] = 1
+        if greedy_number >= self.e:
+            best = 0
+            for action in actions:
+                if self.policy[state, action] > best:
+                    best = self.policy[state, action]
+                    chosen_action = action
+        else:
+            random_index = random.randint(0, len(actions))
+            chosen_action = actions[random_index]
 
-    def produce_initial_state(self):
-        pass
+        return best
 
-    def game_is_over(self):
-        pass
+    def update_policy(
+        self, state: object, action: tuple, td_error: float, eligibility: float
+    ):
+        """ Updates the policy for a given state and action based on the TD error
+        computed by the Critic """
+
+        try:
+            self.policy[state, action] += self.a * self.d * eligibility
+        except:
+            self.policy[state, action] = self.a * self.d * eligibility
 

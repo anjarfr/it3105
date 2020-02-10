@@ -1,12 +1,9 @@
 import yaml
-from environment.rules import Peg, Hex
-from environment.visualizer import Visualizer
-from agent.critic import Critic
-from agent.actor import Actor
+from environment.game import Peg, Hex
+from agent.agent import Agent
 
 with open("../config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
-
 
 class Player:
     """
@@ -20,10 +17,8 @@ class Player:
 
     def __init__(self):
         self.game = self.initialize_game()
-        self.init_state = self.game.board
-        self.episodes = cfg["RL_system"]["episodes"]
-        self.actor = Actor(self.init_state, cfg)
-        self.critic = Critic(self.init_state, cfg)
+        self.agent = Agent(cfg)
+        self.episodes = cfg['RL_system']['episodes']
 
     def initialize_game(self):
         game_type = cfg["game"]["type"]
@@ -31,43 +26,26 @@ class Player:
             game = Peg()
         if game_type == "Hex":
             game = Hex()
-
         return game
 
     def play_game(self):
-        while not self.game.is_finished():  # add timeout
-            state = self.game.board
-            action = self.actor.choose_action(state, self.game.get_all_legal_actions())
-            succ_state, reward = self.game.perform_action(action)
-            self.critic.update_value_function(state, action, reward, succ_state)
+        for i in range(self.episodes):
+            self.agent.TD_learning(self.game)
 
-    def translate_actions(self, actions):
+    def map_actions(self, actions):
         """
-        Translate between actions of the form start, jump, end and action number
+        Maps action from dictionary to list of tuples
         """
+        listed_actions = []
+        for key, values in actions:
+            for value in values:
+                listed_actions.append((key, value))
+        return listed_actions
 
 def main():
-    game_type = cfg["game"]["type"]
-    if game_type == "Peg":
-        game = Peg()
-    if game_type == "Hex":
-        game = Hex()
-
-
-    display_options = cfg["display"]
-    visualizer = Visualizer(game.board, game.size, game.shape, display_options)
-    visualizer.fill_nodes(game.board.get_filled_cells())
-
-    game.perform_action((0, 3), (1, 2), (2, 1))
-    visualizer.fill_nodes(game.board.get_filled_cells())
-    game.perform_action((3, 0), (2, 1), (1, 2))
-    visualizer.fill_nodes(game.board.get_filled_cells())
-
-    for a in game.history:
-        print(a.get_filled_cells())
-
-    print(game.board.get_filled_cells())
-
+    pass
 
 if __name__ == "__main__":
     main()
+
+

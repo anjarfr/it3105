@@ -31,9 +31,21 @@ class Board:
         filled = []
         for row in self.cells:
             for cell in row:
-                if cell.is_filled():
-                    filled.append(cell.coordinates)
+                if cell != None:
+                    if cell.is_filled():
+                        filled.append(cell.coordinates)
         return filled
+
+    def generate_state(self):
+        """ Creates 1d numpy array with board state """
+
+        state = []
+        for row in self.cells:
+            for cell in row:
+                if cell != None:
+                    state.extend(cell.state)
+        array = np.array(state)
+        return array
 
 
 class Triangle(Board):
@@ -128,8 +140,9 @@ class Diamond(Board):
 
 class Cell:
     """
-    Represents a cell in the board. Has a state that can have
-    3 values: (0,0) - emtpy, (0,1) - player 1, (1,0) - player 2
+    Represents a cell in the board. The state can have the values
+    Peg: (0,0) - empty, (0,1) - filled
+    Hex: (0,0) - emtpy, (0,1) - player 1, (1,0) - player 2
     """
 
     def __init__(self, state, coordinates):
