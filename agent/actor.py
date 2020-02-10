@@ -9,14 +9,13 @@ class Actor:
     Update policy based on TD error
     """
 
-    def __init__(
-        self, learning_rate: float, eligibility_decay: float, init_epsilon: float
-    ):
+    def __init__(self, cfg):
         self.policy = {}
-        self.a = learning_rate
-        self.d = eligibility_decay
-        self.e = init_epsilon
-        self.e_s
+        self.alpha = cfg['actor']['learning_rate']
+        self.delta = cfg['actor']['eligibility_decay']
+        self.gamma = cfg['actor']['discount_factor']
+        self.epsilon = cfg['actor']['init_epsilon']
+        self.epsilon_decay = cfg['actor']['epsilon_decay_rate']
 
     def produce_initial_state(self, init_state, init_actions):
         """ Initializes policy of inital state """

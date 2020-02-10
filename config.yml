@@ -34,4 +34,4 @@ actor:
   eligibility_decay: 1
   discount_factor: 1
   init_epsilon: 0.5
-  decay_rate: 0.6
+  epsilon_decay_rate: 0.6

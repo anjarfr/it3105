@@ -111,9 +111,10 @@ class Peg(Game):
         self.board.set_cell(end[0], end[1], (0, 1))
 
         reward = 0
+
         if self.is_in_goal_state():
             reward = 100
-        if self.no_more_actions():
+        elif self.no_more_actions():
             reward = -10
 
         return self.board, reward
@@ -126,6 +127,9 @@ class Peg(Game):
 
     def no_more_actions(self):
         return len(self.board.search_legal_actions()) == 0
+
+    def is_finished(self):
+        return self.is_in_goal_state() or self.no_more_actions()
 
 
 class Hex(Game):
