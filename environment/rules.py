@@ -86,7 +86,7 @@ class Peg(Game):
                 actions = self.get_legal_actions(row, col)
                 if len(actions) > 0:
                     legal_actions[(row, col)] = actions
-        return legal_actions
+        self.legal_actions = legal_actions
 
     def perform_action(self, start: tuple, end: tuple):
         """
@@ -111,16 +111,21 @@ class Peg(Game):
         self.board.set_cell(end[0], end[1], (0, 1))
 
         reward = 0
-        if self.is_finished():
+        if self.is_in_goal_state():
             reward = 100
+        if self.no_more_actions():
+            reward = -10
 
         return self.board, reward
 
     def get_pegs(self):
         return len(self.board.get_filled_cells())
 
-    def is_finished(self):
+    def is_in_goal_state(self):
         return self.get_pegs() == 1
+
+    def no_more_actions(self):
+        return len(self.board.search_legal_actions()) == 0
 
 
 class Hex(Game):

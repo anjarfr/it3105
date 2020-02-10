@@ -7,7 +7,7 @@ board:
 game:
   type: Peg #Hex
   open_cells: 1
-  open_positions: [[2,0]]
+  open_positions: [[2, 0]]
 
 display:
   node_size: 1500
@@ -33,8 +33,5 @@ actor:
   learning_rate: 0.5
   eligibility_decay: 1
   discount_factor: 1
-  init_epsilon: 1
+  init_epsilon: 0.5
   decay_rate: 0.6
-
-
-

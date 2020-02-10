@@ -1,3 +1,6 @@
+import random
+
+
 class Actor:
 
     """
@@ -6,20 +9,49 @@ class Actor:
     Update policy based on TD error
     """
 
-    def __init__(self, cfg):
+    def __init__(
+        self, learning_rate: float, eligibility_decay: float, init_epsilon: float
+    ):
         self.policy = {}
+        self.a = learning_rate
+        self.d = eligibility_decay
+        self.e = init_epsilon
+        self.e_s
+
+    def produce_initial_state(self, init_state, init_actions):
+        """ Initializes policy of inital state """
+        for action in init_actions:
+            self.policy[init_state, action] = 0
 
     def choose_action(self, state, actions):
         """
-        Return state number (a1, a2, a3 etc)
+        Epsilon Greepy Policy for choosing action
+        Choose the best possible action with a probability 1-e,
+        and a random action with probability e
         """
-        pass
 
-    def produce_initial_state(self):
-        pass
+        greedy_number = random.uniform(0, 1)
 
-    def game_is_over(self):
-        pass
+        if greedy_number >= self.e:
+            best = 0
+            for action in actions:
+                if self.policy[state, action] > best:
+                    best = self.policy[state, action]
+                    chosen_action = action
+        else:
+            random_index = random.randint(0, len(actions))
+            chosen_action = actions[random_index]
 
-    def perform_action(self):
-        pass
+        return best
+
+    def update_policy(
+        self, state: object, action: tuple, td_error: float, eligibility: float
+    ):
+        """ Updates the policy for a given state and action based on the TD error
+        computed by the Critic """
+
+        try:
+            self.policy[state, action] += self.a * self.d * eligibility
+        except:
+            self.policy[state, action] = self.a * self.d * eligibility
+
