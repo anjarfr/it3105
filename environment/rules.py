@@ -115,7 +115,7 @@ class Peg(Game):
         return len(self.board.get_filled_cells())
 
     def is_finished(self):
-        return self.get_pegs() == 1
+        return self.get_pegs() == 1 or self.search_legal_actions() == 0
 
 
 class Hex(Game):

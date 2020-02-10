@@ -26,13 +26,13 @@ critic:
   type: table #NN
   dimensions: [15, 20, 30, 5, 1] # Number of nodes in each layer
   learning_rate: 0.1 # If NN is used, lr for critic should be much lower than for actor
-  eligibility_decay: 1
-  discount_factor: 1
+  eligibility_decay: 0.5 # Range [0,1]
+  discount_factor: 0.9 # Range [0,1]
 
 actor:
   learning_rate: 0.5
-  eligibility_decay: 1
-  discount_factor: 1
+  eligibility_decay: 0.6 # Range [0,1]
+  discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
   decay_rate: 0.6
 

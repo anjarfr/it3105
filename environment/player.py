@@ -21,6 +21,7 @@ class Player:
     def __init__(self):
         self.game = self.initialize_game()
         self.init_state = self.game.board
+        self.episodes = cfg["RL_system"]["episodes"]
         self.actor = Actor(self.init_state, cfg)
         self.critic = Critic(self.init_state, cfg)
 
@@ -34,11 +35,12 @@ class Player:
         return game
 
     def play_game(self):
-        while not self.game.is_finished():
-            state = self.game.board
-            action = self.actor.choose_action(state, self.game.get_all_legal_actions())
-            succ_state, reward = self.game.perform_action(action)
-            self.critic.update_value_function(state, action, reward, succ_state)
+        for i in range (self.episodes):
+            while not self.game.is_finished():  # add timeout
+                state = self.game.board
+                action = self.actor.choose_action(state, self.game.get_all_legal_actions())
+                succ_state, reward = self.game.perform_action(action)
+                self.critic.update_value_function(state, action, reward, succ_state)
 
     def translate_actions(self, actions):
         """
