@@ -1,3 +1,6 @@
+from agent.actor import Actor
+from agent.critic import Critic
+
 class Agent:
     def __init__(self, cfg):
         self.actor = Actor(cfg)
