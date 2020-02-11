@@ -89,14 +89,16 @@ class Peg(Game):
 
         return legal_actions
 
-    def perform_action(self, start: tuple, end: tuple):
+    def perform_action(self, action):
         """
         Perform the action chosen by Actor/Critic.
         Appends the previous board state to history.
         Returns the new state and the given reward
         from that action, given state
         """
-        # TODO handle the form of actions given from agent
+
+        start = action[0]
+        end = action[1]
 
         self.history.append(self.board)
 

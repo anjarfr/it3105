@@ -1,8 +1,6 @@
 import random
 
-
 class Actor:
-
     """
     Get current state and legal actions from player
     Decide action
@@ -14,22 +12,37 @@ class Actor:
         self.eligibility = {}
 
         self.alpha = cfg['actor']['learning_rate']
-        self.delta = cfg['actor']['eligibility_decay']
-        self.gamma = cfg['actor']['discount_factor']
+        self.eligibility_decay = cfg['actor']['eligibility_decay']
+        self.discount_factor = cfg['actor']['discount_factor']
         self.epsilon = cfg['actor']['init_epsilon']
         self.epsilon_decay = cfg['actor']['epsilon_decay_rate']
 
     def initialize_policy(self, state, possible_actions):
-        """ Initializes policy of inital state """
+        """
+        Initializes policy of state, if not already in the list
+        """
         for action in possible_actions:
-            self.policy[(state, action)] = 0
+            if not self.policy.get((state, action)):
+                self.policy[(state, action)] = 0
 
-    def reset_eligibility(self):
+    def reset_eligibilities(self):
         """
         Reset eligibilities to 0 for all s,a in self.eligibility
         """
         for key in self.eligibility:
             self.eligibility[key] = 0
+
+    def set_current_eligibility(self, state, action):
+        """
+        Sets eligibility of the current state to 1
+        """
+        self.eligibility[(state, action)] = 1
+
+    def update_eligibility(self, state, action):
+        """
+        Update eligibility with discount and decay
+        """
+        self.eligibility[(state, action)] = self.discount_factor * self.eligibility_decay * self.eligibility[(state, action)]
 
     def choose_action(self, state, actions):
         """
@@ -42,8 +55,8 @@ class Actor:
         if greedy_number >= self.e:
             best = 0
             for action in actions:
-                if self.policy[state, action] > best:
-                    best = self.policy[state, action]
+                if self.policy[(state, action)] > best:
+                    best = self.policy[(state, action)]
                     chosen_action = action
         else:
             random_index = random.randint(0, len(actions))
@@ -51,14 +64,9 @@ class Actor:
 
         return best
 
-    def update_policy(
-        self, state: object, action: tuple, td_error: float, eligibility: float
-    ):
-        """ Updates the policy for a given state and action based on the TD error
-        computed by the Critic """
-
-        try:
-            self.policy[state, action] += self.a * self.d * eligibility
-        except:
-            self.policy[state, action] = self.a * self.d * eligibility
-
+    def update_policy(self, state: object, action: tuple, td_error: float):
+        """
+        Updates the policy for a given state and action based on the TD error
+        computed by the Critic
+        """
+        self.policy[(state, action)] += self.alpha * td_error * self.eligibility[(state, action)]
