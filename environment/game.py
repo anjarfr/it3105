@@ -96,6 +96,7 @@ class Peg(Game):
         Returns the new state and the given reward
         from that action, given state
         """
+        # TODO handle the form of actions given from agent
 
         self.history.append(self.board)
 

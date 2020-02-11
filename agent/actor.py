@@ -11,16 +11,25 @@ class Actor:
 
     def __init__(self, cfg):
         self.policy = {}
+        self.eligibility = {}
+
         self.alpha = cfg['actor']['learning_rate']
         self.delta = cfg['actor']['eligibility_decay']
         self.gamma = cfg['actor']['discount_factor']
         self.epsilon = cfg['actor']['init_epsilon']
         self.epsilon_decay = cfg['actor']['epsilon_decay_rate']
 
-    def produce_initial_state(self, init_state, init_actions):
+    def initialize_policy(self, state, possible_actions):
         """ Initializes policy of inital state """
-        for action in init_actions:
-            self.policy[init_state, action] = 0
+        for action in possible_actions:
+            self.policy[(state, action)] = 0
+
+    def reset_eligibility(self):
+        """
+        Reset eligibilities to 0 for all s,a in self.eligibility
+        """
+        for key in self.eligibility:
+            self.eligibility[key] = 0
 
     def choose_action(self, state, actions):
         """
