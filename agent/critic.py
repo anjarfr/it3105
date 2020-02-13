@@ -61,3 +61,24 @@ class Critic:
         self.value_function[state] += (
             self.learning_rate * TD_error * self.eligibility[state]
         )
+
+
+class CriticNN(Critic):
+
+    """
+    Input as bit vector
+    Target = r + discount_factor * V(s')
+    Weight updates basis : dL/dw = -2 * TDerror * dV(s)/dw
+
+    Conclusion:
+    e_i = e_i + dV(s) / dw_i
+    Weight update w_i = w_I + learning rate * TDerror * e_i
+    """
+
+    def __init__(self, cfg):
+        super(CriticNN, self).__init__(cfg)
+
+
+    def build_model(self):
+        pass
+

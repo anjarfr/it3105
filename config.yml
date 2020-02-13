@@ -13,6 +13,8 @@ display:
   node_size: 1500
   initial_color: 'white'
   filled_color: 'plum'
+  from_color: 'silver'
+  to_color: 'darkorchid'
   frequency: 1
   delay: 2
   display: # When should games be visualized?

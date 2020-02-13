@@ -80,7 +80,7 @@ class Visualizer:
         G.add_edges_from(self.edges)
         return G
 
-    def fill_nodes(self, filled_nodes):
+    def fill_nodes(self, filled_nodes, jump_from, jump_to):
         """
         Takes in a list of node coordinates
         and colors them with the selected
