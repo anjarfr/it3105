@@ -1,5 +1,6 @@
 import random
 
+
 class Actor:
     """
     Get current state and legal actions from player
@@ -11,11 +12,11 @@ class Actor:
         self.policy = {}
         self.eligibility = {}
 
-        self.alpha = cfg['actor']['learning_rate']
-        self.eligibility_decay = cfg['actor']['eligibility_decay']
-        self.discount_factor = cfg['actor']['discount_factor']
-        self.epsilon = cfg['actor']['init_epsilon']
-        self.epsilon_decay = cfg['actor']['epsilon_decay_rate']
+        self.alpha = cfg["actor"]["learning_rate"]
+        self.eligibility_decay = cfg["actor"]["eligibility_decay"]
+        self.discount_factor = cfg["actor"]["discount_factor"]
+        self.epsilon = cfg["actor"]["init_epsilon"]
+        self.epsilon_decay = cfg["actor"]["epsilon_decay_rate"]
 
     def initialize_policy(self, state, possible_actions):
         """
@@ -42,7 +43,11 @@ class Actor:
         """
         Update eligibility with discount and decay
         """
-        self.eligibility[(state, action)] = self.discount_factor * self.eligibility_decay * self.eligibility[(state, action)]
+        self.eligibility[(state, action)] = (
+            self.discount_factor
+            * self.eligibility_decay
+            * self.eligibility[(state, action)]
+        )
 
     def choose_action(self, state, actions):
         """
@@ -52,7 +57,7 @@ class Actor:
         """
         greedy_number = random.uniform(0, 1)
 
-        if greedy_number >= self.e:
+        if greedy_number >= self.epsilon:
             best = 0
             for action in actions:
                 if self.policy[(state, action)] > best:
@@ -62,11 +67,13 @@ class Actor:
             random_index = random.randint(0, len(actions))
             chosen_action = actions[random_index]
 
-        return best
+        return chosen_action
 
     def update_policy(self, state: object, action: tuple, td_error: float):
         """
         Updates the policy for a given state and action based on the TD error
         computed by the Critic
         """
-        self.policy[(state, action)] += self.alpha * td_error * self.eligibility[(state, action)]
+        self.policy[(state, action)] += (
+            self.alpha * td_error * self.eligibility[(state, action)]
+        )

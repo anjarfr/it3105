@@ -95,7 +95,7 @@ class Player:
 
 def main():
     player = Player()
-    player.game.terminal_print()
+    player.play_game()
 
 
 if __name__ == "__main__":
