@@ -56,16 +56,18 @@ class Actor:
         and a random action with probability e
         """
         greedy_number = random.uniform(0, 1)
+        chosen_action = None
 
-        if greedy_number >= self.epsilon:
-            best = 0
-            for action in actions:
-                if self.policy[(state, action)] > best:
-                    best = self.policy[(state, action)]
-                    chosen_action = action
-        else:
-            random_index = random.randint(0, len(actions) - 1)
-            chosen_action = actions[random_index]
+        if len(actions) > 0:
+            if greedy_number >= self.epsilon:
+                best = 0
+                for action in actions:
+                    if self.policy[(state, action)] > best:
+                        best = self.policy[(state, action)]
+                        chosen_action = action
+            else:
+                random_index = random.randint(0, len(actions) - 1)
+                chosen_action = actions[random_index]
 
         return chosen_action
 

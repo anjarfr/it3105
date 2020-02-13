@@ -41,6 +41,8 @@ class Player:
         if cfg["display"]["frequency"] != 0:
             self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
+        wins = 0
+
         for i in range(self.episodes):
             """ New game """
 
@@ -69,8 +71,6 @@ class Player:
             self.critic.reset_eligibility()
             self.actor.reset_eligibilities()
             self.SAP_history = []
-
-            self.game.terminal_print()
 
             while not self.game.is_finished():
 
@@ -123,12 +123,13 @@ class Player:
                                 self.game.board.get_filled_cells(), action[0], action[1]
                             )
 
-                self.game.terminal_print()
 
                 state = succ_state
                 action = succ_action
 
-            print(i, ": ", self.game.get_pegs())
+            pegs = self.game.get_pegs()
+            if pegs == 1: wins += 1
+        print(wins)
 
 
 def main():

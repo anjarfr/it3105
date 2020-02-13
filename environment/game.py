@@ -1,5 +1,4 @@
 import yaml
-from copy import deepcopy
 from environment.board import Triangle, Diamond
 
 with open("config.yml", "r") as ymlfile:
@@ -10,7 +9,6 @@ class Game:
     def __init__(self):
         self.size = cfg["board"]["size"]
         self.shape = cfg["board"]["shape"]
-        self.history = []
 
         if self.shape == "triangle":
             self.board = Triangle(self.size)
@@ -113,10 +111,6 @@ class Peg(Game):
 
         start = action[0]
         end = action[1]
-
-        self.history.append(self.board)
-
-        self.board = deepcopy(self.board)
 
         # Calculate which cell the peg jumps over
         row_diff = start[0] - end[0]
