@@ -3,7 +3,7 @@ from environment.game import Peg, Hex
 from agent.actor import Actor
 from agent.critic import Critic
 
-with open("../config.yml", "r") as ymlfile:
+with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
 
@@ -21,7 +21,7 @@ class Player:
         self.game = self.initialize_game()
         self.actor = Actor(cfg)
         self.critic = Critic(cfg)
-        self.episodes = cfg['RL_system']['episodes']
+        self.episodes = cfg["RL_system"]["episodes"]
         self.visited_SAP = []
 
     def initialize_game(self):
@@ -57,8 +57,12 @@ class Player:
                 self.visited_SAP.append((state, action))
 
                 succ_state, reward = self.game.perform_action(action)
-                possible_succ_actions = self.actor.choose_action(succ_state, self.game.get_all_legal_actions())
-                succ_action = self.actor.choose_action(succ_state, possible_succ_actions)
+                possible_succ_actions = self.actor.choose_action(
+                    succ_state, self.game.get_all_legal_actions()
+                )
+                succ_action = self.actor.choose_action(
+                    succ_state, possible_succ_actions
+                )
 
                 self.actor.set_current_eligibility(state, action)
 
@@ -88,10 +92,12 @@ class Player:
                 listed_actions.append((key, value))
         return listed_actions
 
+
 def main():
-    pass
+    player = Player()
+    player.game.terminal_print()
+
 
 if __name__ == "__main__":
     main()
-
 
