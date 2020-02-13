@@ -1,7 +1,7 @@
 # Environment parameters
 
 board:
-  size: 5
+  size: 4
   shape: triangle #diamond
 
 game:

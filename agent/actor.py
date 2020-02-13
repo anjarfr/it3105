@@ -49,7 +49,7 @@ class Actor:
             * self.eligibility[(state, action)]
         )
 
-    def choose_action(self, state: str, actions: tuple):
+    def choose_action(self, state: str, actions: list):
         """
         Epsilon Greepy Policy for choosing action
         Choose the best possible action with a probability 1-e,
