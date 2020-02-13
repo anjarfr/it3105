@@ -55,6 +55,7 @@ class Player:
             self.critic.initialize_value_function(
                 init_state
             )  # Creares dictionary {string: value}
+
             self.actor.initialize_policy(
                 init_state, possible_actions
             )  # Creates dictionary {string: tuple of tuple}
@@ -66,12 +67,15 @@ class Player:
             state = init_state  # String
             action = init_action  # Tuple of tuple
 
+
             """ Reset all elegibilities to 0 """
             self.critic.reset_eligibility()
             self.actor.reset_eligibilities()
             self.SAP_history = []
 
             while not self.game.is_finished():
+
+                print(self.actor.policy)
 
                 """ Play game until termination """
                 self.critic.initialize_value_function(
@@ -85,14 +89,13 @@ class Player:
                 """ Add performed action to SAP history"""
                 self.SAP_history.append((state, action))
 
-                """ Dictate a' from the current policy for s' """
-                possible_succ_actions = self.game.get_all_legal_actions()
-
-                succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
-
                 """ Dynamically update value function and policy as new """
                 self.critic.initialize_value_function(succ_state)
+
+                """ Dictate a' from the current policy for s' """
+                possible_succ_actions = self.game.get_all_legal_actions()
                 self.actor.initialize_policy(succ_state, possible_succ_actions)
+                succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
 
                 """ Set eligibility of a and s to 1 """
                 self.actor.set_current_eligibility(state, action)
@@ -118,7 +121,6 @@ class Player:
                         self.visualizer.fill_nodes(
                             self.game.board.get_filled_cells(), action[0], action[1]
                         )
-
 
                 state = succ_state
                 if succ_action:

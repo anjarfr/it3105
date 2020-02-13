@@ -62,7 +62,7 @@ class Actor:
             if greedy_number >= self.epsilon:
                 best = 0
                 for action in actions:
-                    if self.policy[(state, action)] > best:
+                    if self.policy[(state, action)] >= best:
                         best = self.policy[(state, action)]
                         chosen_action = action
             else:
@@ -76,6 +76,5 @@ class Actor:
         Updates the policy for a given state and action based on the TD error
         computed by the Critic
         """
-        self.policy[(state, action)] += (
-            self.alpha * td_error * self.eligibility[(state, action)]
-        )
+        curr_value = self.policy.get((state, action))
+        self.policy[(state, action)] = curr_value + self.alpha * td_error * self.eligibility[(state, action)]
