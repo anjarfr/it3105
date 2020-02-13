@@ -13,6 +13,8 @@ class Visualizer:
         self.node_size = display_options["node_size"]
         self.initial_color = display_options["initial_color"]
         self.filled_color = display_options["filled_color"]
+        self.start_color = "silver"
+        self.end_color = "darkorchid"
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()
@@ -80,7 +82,7 @@ class Visualizer:
         G.add_edges_from(self.edges)
         return G
 
-    def fill_nodes(self, filled_nodes):
+    def fill_nodes(self, filled_nodes, jump_from=None, jump_to=None):
         """
         Takes in a list of node coordinates
         and colors them with the selected
@@ -93,12 +95,27 @@ class Visualizer:
         for index in filled_indexes:
             self.node_colors[index] = self.filled_color
 
+        if jump_from != None and jump_to != None:
+            start = self.nodes.index(jump_from)
+            end = self.nodes.index(jump_to)
+            self.node_colors[start] = self.start_color
+            self.node_colors[end] = self.end_color
+
         self.display_board()
+
+    def close_event(self):
+        plt.close()  # timer calls this function after 3 seconds and closes the window
 
     def display_board(self):
         """ Displays the board """
 
-        plt.figure(figsize=(10, 10))
+        fig = plt.figure(figsize=(10, 10))
+
+        timer = fig.canvas.new_timer(
+            interval=1000
+        )  # creating a timer object and setting an interval of 3000 milliseconds
+        timer.add_callback(self.close_event)
+
         nx.draw_networkx(
             self.graph,
             pos=self.positions,
@@ -106,6 +123,8 @@ class Visualizer:
             node_size=self.node_size,
             edgecolors="black",
         )
+
         plt.axis("off")
+        timer.start()
         plt.show()
 

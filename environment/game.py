@@ -20,8 +20,12 @@ class Game:
     def terminal_print(self):
         # Simple printout of all cell states in board
         for row in self.board.cells:
+            rowstring = ""
             for cell in row:
-                print(cell.state, cell.coordinates) if cell != None else print(cell)
+                if cell != None:
+                    rowstring += str(cell.state[1]) + " "
+            print(rowstring)
+        print("--------")
 
 
 class Peg(Game):
@@ -68,7 +72,7 @@ class Peg(Game):
                     target_cell = self.board.cells[target_row][target_col]
 
                     # If that cell is empty
-                    if target_cell != None and not target_cell.is_filled():
+                    if not target_cell.is_filled():
 
                         # The peg can jump over node to get to target cell!
                         legal_actions.append((target_row, target_col))
@@ -80,13 +84,22 @@ class Peg(Game):
         Return all possible legal actions from the board
         """
         legal_actions = []
+
+        # For all cells
         for row in range(self.size):
             for col in range(self.size):
-                actions = self.get_legal_actions(row, col)
-                if len(actions) > 0:
-                    for jump_to in actions:
-                        jump_from = (row, col)
-                        legal_actions.append((jump_from, jump_to))
+                cell = self.board.cells[row][col]
+
+                # If this is a legal cell and there is a peg here
+                if self.board.is_legal_cell(row, col) and cell.is_filled():
+
+                    # Find all positions the peg can jump to
+                    actions = self.get_legal_actions(row, col)
+
+                    if len(actions) > 0:
+                        for jump_to in actions:
+                            jump_from = (row, col)
+                            legal_actions.append((jump_from, jump_to))
 
         return legal_actions
 

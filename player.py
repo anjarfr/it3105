@@ -38,27 +38,30 @@ class Player:
 
     def play_game(self):
 
-        self.visualizer.fill_nodes(self.game.board.get_filled_cells())
-
-        init_state = self.game.board.generate_state()  # String with state
-
-        possible_actions = (
-            self.game.get_all_legal_actions()
-        )  # List of actions [(from), (to)]
-
-        self.critic.initialize_value_function(
-            init_state
-        )  # Creares dictionary {string: value}
-        self.actor.initialize_policy(
-            init_state, possible_actions
-        )  # Creates dictionary {string: tuple of tuple}
-
-        init_action = self.actor.choose_action(
-            init_state, possible_actions
-        )  # Tuple of tuple
+        if cfg["display"]["frequency"] != 0:
+            self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
         for i in range(self.episodes):
             """ New game """
+
+            self.game = self.initialize_game()
+            init_state = self.game.board.generate_state()  # String with state
+
+            possible_actions = (
+                self.game.get_all_legal_actions()
+            )  # List of actions [(from), (to)]
+
+            self.critic.initialize_value_function(
+                init_state
+            )  # Creares dictionary {string: value}
+            self.actor.initialize_policy(
+                init_state, possible_actions
+            )  # Creates dictionary {string: tuple of tuple}
+
+            init_action = self.actor.choose_action(
+                init_state, possible_actions
+            )  # Tuple of tuple
+
             state = init_state  # String
             action = init_action  # Tuple of tuple
 
@@ -67,7 +70,10 @@ class Player:
             self.actor.reset_eligibilities()
             self.SAP_history = []
 
+            self.game.terminal_print()
+
             while not self.game.is_finished():
+
                 """ Play game until termination """
                 self.critic.initialize_value_function(
                     state
@@ -82,38 +88,45 @@ class Player:
 
                 """ Dictate a' from the current policy for s' """
                 possible_succ_actions = self.game.get_all_legal_actions()
-                succ_action = self.actor.choose_action(
-                    succ_state, possible_succ_actions
-                )  # tuple of tuple
 
-                """ Dynamically update value function and policy as new """
-                self.critic.initialize_value_function(succ_state)
-                self.actor.initialize_policy(succ_state, possible_succ_actions)
+                if len(possible_succ_actions) > 0:
+                    succ_action = self.actor.choose_action(
+                        succ_state, possible_succ_actions
+                    )  # tuple of tuple
 
-                """ Set eligibility of a and s to 1 """
-                self.actor.set_current_eligibility(state, action)
+                    """ Dynamically update value function and policy as new """
+                    self.critic.initialize_value_function(succ_state)
+                    self.actor.initialize_policy(succ_state, possible_succ_actions)
 
-                """ Compute TD error """
-                TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
+                    """ Set eligibility of a and s to 1 """
+                    self.actor.set_current_eligibility(state, action)
 
-                """ Set current state eligibility to 1 """
-                self.critic.set_current_eligibility(state)
+                    """ Compute TD error """
+                    TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
 
-                for SAP in self.SAP_history:
-                    state = SAP[0]
-                    action = SAP[1]
+                    """ Set current state eligibility to 1 """
+                    self.critic.set_current_eligibility(state)
 
-                    self.critic.update_value_function(state, TD_error)
-                    self.critic.update_eligibility(state)
+                    for SAP in self.SAP_history:
+                        state = SAP[0]
+                        action = SAP[1]
 
-                    self.actor.update_policy(state, action, TD_error)
-                    self.actor.update_eligibility(state, action)
+                        self.critic.update_value_function(state, TD_error)
+                        self.critic.update_eligibility(state)
+
+                        self.actor.update_policy(state, action, TD_error)
+                        self.actor.update_eligibility(state, action)
+
+                    if cfg["display"]["frequency"] != 0:
+                        if i % cfg["display"]["frequency"] == 0:
+                            self.visualizer.fill_nodes(
+                                self.game.board.get_filled_cells(), action[0], action[1]
+                            )
+
+                self.game.terminal_print()
 
                 state = succ_state
                 action = succ_action
-
-                if i % cfg["display"]["frequency"] == 0:
-                    self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
             print(i, ": ", self.game.get_pegs())
 
