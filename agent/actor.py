@@ -18,13 +18,18 @@ class Actor:
         self.epsilon = cfg["actor"]["init_epsilon"]
         self.epsilon_decay = cfg["actor"]["epsilon_decay_rate"]
 
-    def initialize_policy(self, state, possible_actions):
+    def initialize_policy(self, state: str, possible_actions):
         """
-        Initializes policy of state, if not already in the list
+        Initializes policy of state, if not already in the policy
         """
-        for action in possible_actions:
-            if not self.policy.get((state, action)):
-                self.policy[(state, action)] = 0
+        if len(possible_actions) == 1 and not self.policy.get(
+            (state, possible_actions)
+        ):
+            self.policy[(state, possible_actions)] = 0
+        else:
+            for action in possible_actions:
+                if not self.policy.get((state, action)):
+                    self.policy[(state, action)] = 0
 
     def reset_eligibilities(self):
         """
@@ -33,7 +38,7 @@ class Actor:
         for key in self.eligibility:
             self.eligibility[key] = 0
 
-    def set_current_eligibility(self, state, action):
+    def set_current_eligibility(self, state: str, action: tuple):
         """
         Sets eligibility of the current state to 1
         """
@@ -69,7 +74,7 @@ class Actor:
 
         return chosen_action
 
-    def update_policy(self, state: object, action: tuple, td_error: float):
+    def update_policy(self, state: str, action: tuple, td_error: float):
         """
         Updates the policy for a given state and action based on the TD error
         computed by the Critic

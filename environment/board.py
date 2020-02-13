@@ -43,7 +43,8 @@ class Board:
         for row in self.cells:
             for cell in row:
                 if cell != None:
-                    state += str(cell.state)
+                    state += str(cell.state[0])
+                    state += str(cell.state[1])
 
         return state
 

@@ -68,7 +68,7 @@ class Peg(Game):
                     target_cell = self.board.cells[target_row][target_col]
 
                     # If that cell is empty
-                    if not target_cell.is_filled():
+                    if target_cell != None and not target_cell.is_filled():
 
                         # The peg can jump over node to get to target cell!
                         legal_actions.append((target_row, target_col))
@@ -76,16 +76,17 @@ class Peg(Game):
         return legal_actions
 
     def get_all_legal_actions(self):
-        # TODO
         """
         Return all possible legal actions from the board
         """
-        legal_actions = {}
+        legal_actions = []
         for row in range(self.size):
             for col in range(self.size):
                 actions = self.get_legal_actions(row, col)
                 if len(actions) > 0:
-                    legal_actions[(row, col)] = actions
+                    for jump_to in actions:
+                        jump_from = (row, col)
+                        legal_actions.append((jump_from, jump_to))
 
         return legal_actions
 
