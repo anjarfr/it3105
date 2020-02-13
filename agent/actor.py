@@ -23,7 +23,7 @@ class Actor:
         Initializes policy of state, if not already in the policy
         """
         for action in possible_actions:
-            if not self.policy.get((state, action)):
+            if self.policy.get((state, action)) == None:
                 self.policy[(state, action)] = 0
 
     def reset_eligibilities(self):
@@ -56,11 +56,11 @@ class Actor:
         and a random action with probability e
         """
         greedy_number = random.uniform(0, 1)
-        chosen_action = None
+        chosen_action = next(iter(actions))
 
         if len(actions) > 0:
             if greedy_number >= self.epsilon:
-                best = 0
+                best = self.policy[(state, next(iter(actions)))]
                 for action in actions:
                     if self.policy[(state, action)] >= best:
                         best = self.policy[(state, action)]
