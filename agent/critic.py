@@ -15,7 +15,7 @@ class Critic:
         self.eligibility_decay = cfg["critic"]["eligibility_decay"]
         self.discount_factor = cfg["critic"]["discount_factor"]
 
-    def initialize_value_function(self, state):
+    def initialize_value_function(self, state: str):
         """
         Initialize V(s) to 0 if it does not already exist in V()
         """
@@ -39,17 +39,25 @@ class Critic:
         """
         Update eligibility with discount and decay
         """
-        self.eligibility[state] = self.discount_factor * self.eligibility_decay * self.eligibility[state]
+        self.eligibility[state] = (
+            self.discount_factor * self.eligibility_decay * self.eligibility[state]
+        )
 
     def calculate_TD_error(self, state, succ_state, reward):
         """
         Calculates TD error
         """
-        TD_error = reward + self.discount_factor * self.value_function.get(succ_state) - self.value_function.get(state)
+        TD_error = (
+            reward
+            + self.discount_factor * self.value_function[succ_state]
+            - self.value_function[state]
+        )
         return TD_error
 
     def update_value_function(self, state, TD_error):
         """
         Update the value function for a state
         """
-        self.value_function[state] += self.learning_rate * TD_error * self.eligibility[state]
+        self.value_function[state] += (
+            self.learning_rate * TD_error * self.eligibility[state]
+        )

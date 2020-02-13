@@ -22,7 +22,7 @@ class Player:
         self.actor = Actor(cfg)
         self.critic = Critic(cfg)
         self.episodes = cfg["RL_system"]["episodes"]
-        self.visited_SAP = []
+        self.SAP_history = []
 
     def initialize_game(self):
         game_type = cfg["game"]["type"]
@@ -34,43 +34,64 @@ class Player:
 
     def play_game(self):
 
-        init_state = self.game.board
-        possible_actions = self.game.get_all_legal_actions()
-        possible_actions = self.map_actions(possible_actions)
+        init_state = self.game.board.generate_state()  # String with state
 
-        self.critic.initialize_value_function(init_state)
-        self.actor.initialize_policy(init_state, possible_actions)
+        possible_actions = self.game.get_all_legal_actions()  # Dictionary
+        possible_actions = self.map_actions(
+            possible_actions
+        )  # List with tuples of tuples [( (to), (from) )]
 
-        init_action = self.actor.choose_action(init_state, possible_actions)
+        self.critic.initialize_value_function(
+            init_state
+        )  # Creares dictionary {string: value}
+        self.actor.initialize_policy(
+            init_state, possible_actions
+        )  # Creates dictionary {string: tuple of tuple}
+
+        init_action = self.actor.choose_action(
+            init_state, possible_actions
+        )  # Tuple of tuple
 
         for i in range(self.episodes):
-            state = init_state
-            action = init_action
+            """ New game """
+            state = init_state  # String
+            action = init_action  # Tuple of tuple
 
+            """ Reset all elegibilities to 0 """
             self.critic.reset_eligibility()
             self.actor.reset_eligibilities()
-            self.visited_SAP = []
+            self.SAP_history = []
 
             while not self.game.is_finished():
+                """ Play game until termination """
+                self.critic.initialize_value_function(
+                    state
+                )  # Initializes all new states to 0 at the start of an episode
+                self.actor.initialize_policy(
+                    state, action
+                )  # Initializes all new states to 0 at the start of an episode
 
-                self.critic.initialize_value_function(state)
-                self.actor.initialize_policy(state, action)
-                self.visited_SAP.append((state, action))
+                """ Do action a from state s to s', and receive reward r """
+                reward = self.game.perform_action(action)  # Int
+                succ_state = self.game.board.generate_state()  # String
 
-                succ_state, reward = self.game.perform_action(action)
-                possible_succ_actions = self.actor.choose_action(
-                    succ_state, self.game.get_all_legal_actions()
-                )
+                """ Add performed action to SAP history"""
+                self.SAP_history.append((state, action))
+
+                """ Dictate a' from the current policy for s' """
+                possible_succ_actions = self.game.get_all_legal_actions()
                 succ_action = self.actor.choose_action(
-                    succ_state, possible_succ_actions
+                    succ_state, self.map_actions(possible_succ_actions)
                 )
 
+                """ Set eligibility of a and s to 1 """
                 self.actor.set_current_eligibility(state, action)
 
+                """  """
                 TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
                 self.critic.set_current_eligibility(state)
 
-                for SAP in self.visited_SAP:
+                for SAP in self.SAP_history:
                     state = SAP[0]
                     action = SAP[1]
 

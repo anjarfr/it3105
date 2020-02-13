@@ -89,7 +89,7 @@ class Peg(Game):
 
         return legal_actions
 
-    def perform_action(self, action):
+    def perform_action(self, action: tuple):
         """
         Perform the action chosen by Actor/Critic.
         Appends the previous board state to history.
@@ -121,7 +121,7 @@ class Peg(Game):
         elif self.no_more_actions():
             reward = -10
 
-        return self.board, reward
+        return reward
 
     def get_pegs(self):
         return len(self.board.get_filled_cells())
@@ -130,7 +130,7 @@ class Peg(Game):
         return self.get_pegs() == 1
 
     def no_more_actions(self):
-        return len(self.board.search_legal_actions()) == 0
+        return len(self.get_all_legal_actions()) == 0
 
     def is_finished(self):
         return self.is_in_goal_state() or self.no_more_actions()

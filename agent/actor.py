@@ -49,13 +49,12 @@ class Actor:
             * self.eligibility[(state, action)]
         )
 
-    def choose_action(self, state, actions):
+    def choose_action(self, state: str, actions: tuple):
         """
         Epsilon Greepy Policy for choosing action
         Choose the best possible action with a probability 1-e,
         and a random action with probability e
         """
-        print(actions)
         greedy_number = random.uniform(0, 1)
 
         if greedy_number >= self.epsilon:
@@ -65,7 +64,7 @@ class Actor:
                     best = self.policy[(state, action)]
                     chosen_action = action
         else:
-            random_index = random.randint(0, len(actions))
+            random_index = random.randint(0, len(actions) - 1)
             chosen_action = actions[random_index]
 
         return chosen_action

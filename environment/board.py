@@ -37,15 +37,15 @@ class Board:
         return filled
 
     def generate_state(self):
-        """ Creates 1d numpy array with board state """
+        """ Creates a string with board state """
 
-        state = []
+        state = ""
         for row in self.cells:
             for cell in row:
                 if cell != None:
-                    state.extend(cell.state)
-        array = np.array(state)
-        return array
+                    state += str(cell.state)
+
+        return state
 
 
 class Triangle(Board):
