@@ -50,9 +50,10 @@ class Actor:
         Choose the best possible action with a probability 1-e,
         and a random action with probability e
         """
+        print(actions)
         greedy_number = random.uniform(0, 1)
 
-        if greedy_number >= self.e:
+        if greedy_number >= self.epsilon:
             best = 0
             for action in actions:
                 if self.policy[(state, action)] > best:
@@ -62,7 +63,8 @@ class Actor:
             random_index = random.randint(0, len(actions))
             chosen_action = actions[random_index]
 
-        return best
+
+        return chosen_action
 
     def update_policy(self, state: object, action: tuple, td_error: float):
         """

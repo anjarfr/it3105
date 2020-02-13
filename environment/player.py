@@ -36,6 +36,7 @@ class Player:
 
         init_state = self.game.board
         possible_actions = self.game.get_all_legal_actions()
+        possible_actions = self.map_actions(possible_actions)
 
         self.critic.initialize_value_function(init_state)
         self.actor.initialize_policy(init_state, possible_actions)
@@ -83,13 +84,13 @@ class Player:
         Maps action from dictionary to list of tuples
         """
         listed_actions = []
-        for key, values in actions:
+        for key, values in actions.items():
             for value in values:
                 listed_actions.append((key, value))
         return listed_actions
 
 def main():
-    pass
+    Player.play_game(Player())
 
 if __name__ == "__main__":
     main()
