@@ -1,7 +1,7 @@
 import yaml
 from environment.game import Peg, Hex
 from agent.actor import Actor
-from agent.critic import Critic
+from agent.critic import Critic, CriticNN
 from environment.visualizer import Visualizer
 
 with open("config.yml", "r") as ymlfile:
@@ -142,7 +142,9 @@ class Player:
 
 def main():
     player = Player()
-    player.play_game()
+    #player.play_game()
+    cNN = CriticNN(cfg)
+    cNN.build_model('01010101010101')
 
 if __name__ == "__main__":
     main()

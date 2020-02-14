@@ -1,5 +1,5 @@
 from keras.layers import *
-from keras import Model
+from keras import Model, optimizers
 from agent.splitgd import SplitGD
 import numpy as np
 
@@ -92,24 +92,23 @@ class CriticNN(Critic, SplitGD):
         array = np.array(listed_state)
         return array
 
-    def build_model(self, state):
-
-        state = self.generate_state(state)
-
+    def build_model(self, init_state):
+        state = self.generate_state(init_state)
+        print(state.shape[0])
         num_layers = len(self.dimensions)
-
-        inp = Input(shape=state.shape[0])
+        inp = Input(shape=state.shape)
         x = inp
 
         for i in range(num_layers):
             x = Dense(self.dimensions[i], activation='relu')(x)
 
-        model = Model([inp, x])
-        model.compile()
+        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
 
+        model = Model([inp, x])
+        model.compile(loss='mean_squared_error', optimizer=sgd)
+
+        # Connect to splitGD
         self.keras_model = model
 
-        # Connect to splitGD somehow, send in the model
-
-
-
+    def modify_gradients(self, gradients):
+        pass

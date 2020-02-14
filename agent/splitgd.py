@@ -26,18 +26,18 @@ class SplitGD():
         loss = self.model.loss_functions[0](targets,predictions)
         return tf.reduce_mean(loss).numpy() if avg else loss
 
-    def fit(self, features, targets, epochs=1, mbs=1,vfrac=0.1,verbose=True):
+    def fit(self, features, targets, epochs=1, mbs=1, vfrac=0.1, verbose=True):
         params = self.model.trainable_weights
-        train_ins, train_targs, val_ins, val_targs = split_training_data(features,targets,vfrac=vfrac)
+        train_ins, train_targs, val_ins, val_targs = split_training_data(features, targets, vfrac=vfrac)
         for _ in range(epochs):
             for _ in range(math.floor(epochs / mbs)):
                 with tf.GradientTape() as tape:  # Read up on tf.GradientTape !!
-                    feaset,tarset = gen_random_minibatch(train_ins,train_targs,mbs=mbs)
+                    feaset,tarset = gen_random_minibatch(train_ins, train_targs, mbs=mbs)
                     loss = self.gen_loss(feaset,tarset,avg=False)
                     gradients = tape.gradient(loss,params)
                     gradients = self.modify_gradients(gradients)
                     self.model.optimizer.apply_gradients(zip(gradients,params))
-            if verbose: self.end_of_epoch_display(train_ins,train_targs,val_ins,val_targs)
+            if verbose: self.end_of_epoch_display(train_ins, train_targs, val_ins, val_targs)
 
     # Use the 'metric' to run a quick test on any set of features and targets.  A typical metric is some form of
     # 'accuracy', such as 'categorical_accuracy'.  Read up on Keras.metrics !!
