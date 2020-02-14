@@ -1,3 +1,6 @@
+from keras.layers import *
+from keras import Model
+
 class Critic:
     """
     Receive SARSA from player
@@ -78,7 +81,24 @@ class CriticNN(Critic):
     def __init__(self, cfg):
         super(CriticNN, self).__init__(cfg)
 
+        self.dimensions = cfg["critic"]["dimensions"]  # List
 
-    def build_model(self):
-        pass
+    def build_model(self, state):
+
+        # Gjør om state fra string til list sånn [0, 1, 1, 0] osv
+
+        num_layers = len(self.dimensions)
+
+        inp = Input(shape=state.shape[0])
+        x = inp
+
+        for i in range(num_layers):
+            x = Dense(self.dimensions[i], activation='relu')(x)
+
+        model = Model([inp, x])
+        model.compile()
+
+        # Connect to splitGD somehow, send in the model
+
+
 
