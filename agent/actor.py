@@ -22,14 +22,9 @@ class Actor:
         """
         Initializes policy of state, if not already in the policy
         """
-        if len(possible_actions) == 1 and not self.policy.get(
-            (state, possible_actions)
-        ):
-            self.policy[(state, possible_actions)] = 0
-        else:
-            for action in possible_actions:
-                if not self.policy.get((state, action)):
-                    self.policy[(state, action)] = 0
+        for action in possible_actions:
+            if self.policy.get((state, action)) == None:
+                self.policy[(state, action)] = 0
 
     def reset_eligibilities(self):
         """
@@ -54,23 +49,26 @@ class Actor:
             * self.eligibility[(state, action)]
         )
 
-    def choose_action(self, state: str, actions: tuple):
+    def choose_action(self, state: str, actions: list):
         """
         Epsilon Greepy Policy for choosing action
         Choose the best possible action with a probability 1-e,
         and a random action with probability e
         """
         greedy_number = random.uniform(0, 1)
+        chosen_action = next(iter(actions))
 
-        if greedy_number >= self.epsilon:
-            best = 0
-            for action in actions:
-                if self.policy[(state, action)] > best:
-                    best = self.policy[(state, action)]
-                    chosen_action = action
-        else:
-            random_index = random.randint(0, len(actions) - 1)
-            chosen_action = actions[random_index]
+        if len(actions) > 0:
+            if greedy_number >= self.epsilon:
+                best = self.policy[(state, next(iter(actions)))]
+                for action in actions:
+                    if self.policy[(state, action)] >= best:
+                        best = self.policy[(state, action)]
+                        chosen_action = action
+            else:
+                random_index = random.randint(0, len(actions) - 1)
+                chosen_action = actions[random_index]
+
 
         return chosen_action
 
@@ -78,7 +76,8 @@ class Actor:
         """
         Updates the policy for a given state and action based on the TD error
         computed by the Critic
+        Also updates the epsilon for every iteration
         """
-        self.policy[(state, action)] += (
-            self.alpha * td_error * self.eligibility[(state, action)]
-        )
+        curr_value = self.policy.get((state, action))
+        self.policy[(state, action)] = curr_value + self.alpha * td_error * self.eligibility[(state, action)]
+        self.epsilon = self.epsilon * self.epsilon_decay

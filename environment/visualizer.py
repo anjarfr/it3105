@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import time
 
 class Visualizer:
     """ Creates a graphical representation of the game state """
@@ -13,12 +13,22 @@ class Visualizer:
         self.node_size = display_options["node_size"]
         self.initial_color = display_options["initial_color"]
         self.filled_color = display_options["filled_color"]
+        self.start_color = display_options["jump_from_color"]
+        self.end_color = display_options["jump_to_color"]
+        self.timeout = display_options["timeout"]
+        self.diplay_range = self.create_display_range(display_options["display_range"])
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()
         self.edges = self.get_edges()
         self.node_colors = self.initialize_colors()
         self.graph = self.initialize_graph()
+
+    def create_display_range(self, ranges):
+        display_range = []
+        for r in ranges:
+            display_range.extend(range(r[0], r[1]))
+        return display_range
 
     def get_nodes(self):
         """ Get the coordinates of all the cells on the board """
@@ -80,7 +90,7 @@ class Visualizer:
         G.add_edges_from(self.edges)
         return G
 
-    def fill_nodes(self, filled_nodes, jump_from, jump_to):
+    def fill_nodes(self, filled_nodes, jump_from=None, jump_to=None):
         """
         Takes in a list of node coordinates
         and colors them with the selected
@@ -93,12 +103,27 @@ class Visualizer:
         for index in filled_indexes:
             self.node_colors[index] = self.filled_color
 
+        if jump_from != None and jump_to != None:
+            start = self.nodes.index(jump_from)
+            end = self.nodes.index(jump_to)
+            self.node_colors[start] = self.start_color
+            self.node_colors[end] = self.end_color
+
         self.display_board()
+
+    def close_event(self):
+        plt.close()  # timer calls this function after 3 seconds and closes the window
 
     def display_board(self):
         """ Displays the board """
 
-        plt.figure(figsize=(10, 10))
+        fig = plt.figure(figsize=(10, 10))
+
+        timer = fig.canvas.new_timer(
+            interval=self.timeout
+        )  # creating a timer object and setting an interval of 3000 milliseconds
+        timer.add_callback(self.close_event)
+
         nx.draw_networkx(
             self.graph,
             pos=self.positions,
@@ -106,6 +131,8 @@ class Visualizer:
             node_size=self.node_size,
             edgecolors="black",
         )
-        plt.axis("off")
-        plt.show()
 
+        plt.axis("off")
+        #timer.start()
+
+        plt.show()

@@ -7,7 +7,6 @@ from environment.visualizer import Visualizer
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-
 class Player:
     """
     Player is responsible for communication between environment and agent
@@ -38,27 +37,33 @@ class Player:
 
     def play_game(self):
 
-        self.visualizer.fill_nodes(self.game.board.get_filled_cells())
+        if cfg["display"]["frequency"] != 0:
+            self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
-        init_state = self.game.board.generate_state()  # String with state
-
-        possible_actions = (
-            self.game.get_all_legal_actions()
-        )  # List of actions [(from), (to)]
-
-        self.critic.initialize_value_function(
-            init_state
-        )  # Creares dictionary {string: value}
-        self.actor.initialize_policy(
-            init_state, possible_actions
-        )  # Creates dictionary {string: tuple of tuple}
-
-        init_action = self.actor.choose_action(
-            init_state, possible_actions
-        )  # Tuple of tuple
+        wins = 0
 
         for i in range(self.episodes):
             """ New game """
+
+            self.game = self.initialize_game()
+            init_state = self.game.board.generate_state()  # String with state
+
+            possible_actions = (
+                self.game.get_all_legal_actions()
+            )  # List of actions [(from), (to)]
+
+            self.critic.initialize_value_function(
+                init_state
+            )  # Creates dictionary {string: value}
+
+            self.actor.initialize_policy(
+                init_state, possible_actions
+            )  # Creates dictionary {string: tuple of tuple}
+
+            init_action = self.actor.choose_action(
+                init_state, possible_actions
+            )  # Tuple of tuple
+
             state = init_state  # String
             action = init_action  # Tuple of tuple
 
@@ -67,7 +72,11 @@ class Player:
             self.actor.reset_eligibilities()
             self.SAP_history = []
 
+            """ Step counter for display frequency """
+            step = 0
+
             while not self.game.is_finished():
+
                 """ Play game until termination """
                 self.critic.initialize_value_function(
                     state
@@ -80,15 +89,16 @@ class Player:
                 """ Add performed action to SAP history"""
                 self.SAP_history.append((state, action))
 
-                """ Dictate a' from the current policy for s' """
-                possible_succ_actions = self.game.get_all_legal_actions()
-                succ_action = self.actor.choose_action(
-                    succ_state, possible_succ_actions
-                )  # tuple of tuple
-
                 """ Dynamically update value function and policy as new """
                 self.critic.initialize_value_function(succ_state)
-                self.actor.initialize_policy(succ_state, possible_succ_actions)
+
+                """ Dictate a' from the current policy for s' """
+                possible_succ_actions = self.game.get_all_legal_actions()
+
+                if len(possible_succ_actions) > 0:
+                    self.actor.initialize_policy(succ_state, possible_succ_actions)
+                    succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
+
 
                 """ Set eligibility of a and s to 1 """
                 self.actor.set_current_eligibility(state, action)
@@ -109,20 +119,29 @@ class Player:
                     self.actor.update_policy(state, action, TD_error)
                     self.actor.update_eligibility(state, action)
 
+                if i in self.visualizer.diplay_range and cfg["display"]["frequency"] != 0:
+                    if step % cfg["display"]["frequency"] == 0:
+                        self.visualizer.fill_nodes(
+                            self.game.board.get_filled_cells(), action[0], action[1]
+                        )
+
+                step += 1
+
                 state = succ_state
-                action = succ_action
+                if succ_action:
+                    action = succ_action
 
-                if i % cfg["display"]["frequency"] == 0:
-                    self.visualizer.fill_nodes(self.game.board.get_filled_cells())
+            pegs = self.game.get_pegs()
+            if pegs == 1: wins += 1
 
-            print(i, ": ", self.game.get_pegs())
+            print(i, ": ", self.game.get_pegs(), ' pegs were left')
+
+        print('Number of wins: ', wins)
 
 
 def main():
     player = Player()
     player.play_game()
 
-
 if __name__ == "__main__":
     main()
-
