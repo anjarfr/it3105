@@ -69,12 +69,15 @@ class Actor:
                 random_index = random.randint(0, len(actions) - 1)
                 chosen_action = actions[random_index]
 
+
         return chosen_action
 
     def update_policy(self, state: str, action: tuple, td_error: float):
         """
         Updates the policy for a given state and action based on the TD error
         computed by the Critic
+        Also updates the epsilon for every iteration
         """
         curr_value = self.policy.get((state, action))
         self.policy[(state, action)] = curr_value + self.alpha * td_error * self.eligibility[(state, action)]
+        self.epsilon = self.epsilon * self.epsilon_decay

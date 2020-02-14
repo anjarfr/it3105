@@ -72,6 +72,9 @@ class Player:
             self.actor.reset_eligibilities()
             self.SAP_history = []
 
+            """ Step counter for display frequency """
+            step = 0
+
             while not self.game.is_finished():
 
                 """ Play game until termination """
@@ -116,11 +119,13 @@ class Player:
                     self.actor.update_policy(state, action, TD_error)
                     self.actor.update_eligibility(state, action)
 
-                if cfg["display"]["frequency"] != 0:
-                    if i % cfg["display"]["frequency"] == 0:
+                if i in self.visualizer.diplay_range and cfg["display"]["frequency"] != 0:
+                    if step % cfg["display"]["frequency"] == 0:
                         self.visualizer.fill_nodes(
                             self.game.board.get_filled_cells(), action[0], action[1]
                         )
+
+                step += 1
 
                 state = succ_state
                 if succ_action:
@@ -129,9 +134,9 @@ class Player:
             pegs = self.game.get_pegs()
             if pegs == 1: wins += 1
 
-            print(i, ": ", self.game.get_pegs())
+            print(i, ": ", self.game.get_pegs(), ' pegs were left')
 
-        print(wins)
+        print('Number of wins: ', wins)
 
 
 def main():

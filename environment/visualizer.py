@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import time
 
 class Visualizer:
     """ Creates a graphical representation of the game state """
@@ -15,12 +15,20 @@ class Visualizer:
         self.filled_color = display_options["filled_color"]
         self.start_color = display_options["jump_from_color"]
         self.end_color = display_options["jump_to_color"]
+        self.timeout = display_options["timeout"]
+        self.diplay_range = self.create_display_range(display_options["display_range"])
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()
         self.edges = self.get_edges()
         self.node_colors = self.initialize_colors()
         self.graph = self.initialize_graph()
+
+    def create_display_range(self, ranges):
+        display_range = []
+        for r in ranges:
+            display_range.extend(range(r[0], r[1]))
+        return display_range
 
     def get_nodes(self):
         """ Get the coordinates of all the cells on the board """
@@ -112,7 +120,7 @@ class Visualizer:
         fig = plt.figure(figsize=(10, 10))
 
         timer = fig.canvas.new_timer(
-            interval=1000
+            interval=self.timeout
         )  # creating a timer object and setting an interval of 3000 milliseconds
         timer.add_callback(self.close_event)
 
@@ -125,6 +133,6 @@ class Visualizer:
         )
 
         plt.axis("off")
-        timer.start()
-        plt.show()
+        #timer.start()
 
+        plt.show()
