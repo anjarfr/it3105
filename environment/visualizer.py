@@ -13,8 +13,8 @@ class Visualizer:
         self.node_size = display_options["node_size"]
         self.initial_color = display_options["initial_color"]
         self.filled_color = display_options["filled_color"]
-        self.start_color = "silver"
-        self.end_color = "darkorchid"
+        self.start_color = display_options["jump_from_color"]
+        self.end_color = display_options["jump_to_color"]
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()

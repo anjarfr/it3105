@@ -1,7 +1,7 @@
 # Environment parameters
 
 board:
-  size: 8
+  size: 6
   shape: triangle #diamond
 
 game:
@@ -13,25 +13,26 @@ display:
   node_size: 1500
   initial_color: 'white'
   filled_color: 'plum'
-  frequency: 0
-  delay: 2
-  display: # When should games be visualized?
+  jump_from_color: 'silver'
+  jump_to_color: 'darkorchid'
+  frequency: 10
+  display_range: [[0,10], [490, 500]] # Which episodes should be visualized?
 
 # Agent parameters
 
 RL_system:
-  episodes: 1000
+  episodes: 500
 
 critic:
   type: table #NN
   dimensions: [15, 20, 30, 5, 1] # Number of nodes in each layer
   learning_rate: 0.1 # If NN is used, lr for critic should be much lower than for actor
-  eligibility_decay: 0.9 # Range [0,1]
-  discount_factor: 0.9 # Range [0,1]
+  eligibility_decay: 0.99 # Range [0,1]
+  discount_factor: 0.99 # Range [0,1]
 
 actor:
   learning_rate: 0.1
   eligibility_decay: 0.6 # Range [0,1]
-  discount_factor: 0.9 # Range [0,1]
-  init_epsilon: 0.01
+  discount_factor: 0.99 # Range [0,1]
+  init_epsilon: 0.05
   epsilon_decay_rate: 0.6
