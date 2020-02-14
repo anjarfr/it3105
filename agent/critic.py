@@ -1,5 +1,7 @@
 from keras.layers import *
 from keras import Model
+from agent.splitgd import SplitGD
+import numpy as np
 
 class Critic:
     """
@@ -66,7 +68,7 @@ class Critic:
         )
 
 
-class CriticNN(Critic):
+class CriticNN(Critic, SplitGD):
 
     """
     Input as bit vector
@@ -80,12 +82,19 @@ class CriticNN(Critic):
 
     def __init__(self, cfg):
         super(CriticNN, self).__init__(cfg)
-
         self.dimensions = cfg["critic"]["dimensions"]  # List
+
+    def generate_state(self, state):
+        """ Creates a numpy array of state """
+        listed_state = []
+        for c in state:
+            listed_state.append(int(c))
+        array = np.array(listed_state)
+        return array
 
     def build_model(self, state):
 
-        # Gjør om state fra string til list sånn [0, 1, 1, 0] osv
+        state = self.generate_state(state)
 
         num_layers = len(self.dimensions)
 
@@ -97,6 +106,8 @@ class CriticNN(Critic):
 
         model = Model([inp, x])
         model.compile()
+
+        self.keras_model = model
 
         # Connect to splitGD somehow, send in the model
 

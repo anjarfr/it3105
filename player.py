@@ -95,6 +95,7 @@ class Player:
                 """ Dictate a' from the current policy for s' """
                 possible_succ_actions = self.game.get_all_legal_actions()
 
+                succ_action = None
                 if len(possible_succ_actions) > 0:
                     self.actor.initialize_policy(succ_state, possible_succ_actions)
                     succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple

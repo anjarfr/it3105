@@ -127,7 +127,7 @@ class Peg(Game):
         if self.is_in_goal_state():
             reward = 1000
         elif self.no_more_actions():
-            reward = -10 * self.get_pegs()
+            reward = -1*self.get_pegs()
 
         return reward
 
