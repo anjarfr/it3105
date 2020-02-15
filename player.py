@@ -7,6 +7,7 @@ from environment.visualizer import Visualizer
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
+
 class Player:
     """
     Player is responsible for communication between environment and agent
@@ -20,7 +21,8 @@ class Player:
     def __init__(self):
         self.game = self.initialize_game()
         self.actor = Actor(cfg)
-        self.critic = Critic(cfg)
+        self.table_critic = True
+        self.critic = self.initialize_critic()
         self.episodes = cfg["RL_system"]["episodes"]
         self.SAP_history = []
         self.visualizer = Visualizer(
@@ -35,6 +37,16 @@ class Player:
             game = Hex()
         return game
 
+    def initialize_critic(self):
+        critic_type = cfg["critic"]["type"]
+        if critic_type == "table":
+            critic = Critic(cfg)
+        if critic_type == "NN":
+            self.table_critic = False
+            init_state = self.game.board.generate_state()
+            critic = CriticNN(cfg, init_state)
+        return critic
+
     def play_game(self):
 
         if cfg["display"]["frequency"] != 0:
@@ -42,45 +54,36 @@ class Player:
 
         wins = 0
 
+        """ New game """
         for i in range(self.episodes):
-            """ New game """
-
-            self.game = self.initialize_game()
-            init_state = self.game.board.generate_state()  # String with state
-
-            possible_actions = (
-                self.game.get_all_legal_actions()
-            )  # List of actions [(from), (to)]
-
-            self.critic.initialize_value_function(
-                init_state
-            )  # Creates dictionary {string: value}
-
-            self.actor.initialize_policy(
-                init_state, possible_actions
-            )  # Creates dictionary {string: tuple of tuple}
-
-            init_action = self.actor.choose_action(
-                init_state, possible_actions
-            )  # Tuple of tuple
-
-            state = init_state  # String
-            action = init_action  # Tuple of tuple
 
             """ Reset all elegibilities to 0 """
             self.critic.reset_eligibility()
             self.actor.reset_eligibilities()
             self.SAP_history = []
 
+            """Initialize new game"""
+            self.game = self.initialize_game()
+            init_state = self.game.board.generate_state()  # String with state
+            possible_actions = (self.game.get_all_legal_actions())  # List of actions [(from), (to)]
+            self.actor.initialize_policy(init_state, possible_actions)  # Creates dictionary {string: tuple of tuple}
+            init_action = self.actor.choose_action(init_state, possible_actions)  # Tuple of tuple
+
+            if self.table_critic:
+                self.critic.initialize_value_function(init_state)  # Creates dictionary {string: value}
+
+            state = init_state  # String
+            action = init_action  # Tuple of tuple
+
             """ Step counter for display frequency """
             step = 0
 
+            """ Play game until termination """
             while not self.game.is_finished():
 
-                """ Play game until termination """
-                self.critic.initialize_value_function(
-                    state
-                )  # Initializes all new states to 0 at the start of an episode
+                """Initializes all new states to 0 at the start of an episode"""
+                if self.table_critic:
+                    self.critic.initialize_value_function(state)
 
                 """ Do action a from state s to s', and receive reward r """
                 reward = self.game.perform_action(action)  # Int
@@ -90,7 +93,8 @@ class Player:
                 self.SAP_history.append((state, action))
 
                 """ Dynamically update value function and policy as new """
-                self.critic.initialize_value_function(succ_state)
+                if self.table_critic:
+                    self.critic.initialize_value_function(succ_state)
 
                 """ Dictate a' from the current policy for s' """
                 possible_succ_actions = self.game.get_all_legal_actions()
@@ -100,7 +104,6 @@ class Player:
                     self.actor.initialize_policy(succ_state, possible_succ_actions)
                     succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
 
-
                 """ Set eligibility of a and s to 1 """
                 self.actor.set_current_eligibility(state, action)
 
@@ -108,14 +111,16 @@ class Player:
                 TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
 
                 """ Set current state eligibility to 1 """
-                self.critic.set_current_eligibility(state)
+                if self.table_critic:
+                    self.critic.set_current_eligibility(state)
 
                 for SAP in self.SAP_history:
                     state = SAP[0]
                     action = SAP[1]
 
                     self.critic.update_value_function(state, TD_error)
-                    self.critic.update_eligibility(state)
+                    if self.table_critic:
+                        self.critic.update_eligibility(state)
 
                     self.actor.update_policy(state, action, TD_error)
                     self.actor.update_eligibility(state, action)
@@ -139,12 +144,18 @@ class Player:
 
         print('Number of wins: ', wins)
 
+    def visualize_target_policy(self):
+        """
+        After training, visualize a game played using the final policy
+        """
+        pass
+
 
 def main():
     player = Player()
-    #player.play_game()
-    cNN = CriticNN(cfg)
-    cNN.build_model('01010101010101')
+    player.play_game()
+    # cNN = CriticNN(cfg)
+    # cNN.build_model('01010101010101')
 
 if __name__ == "__main__":
     main()

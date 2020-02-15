@@ -11,19 +11,22 @@ import numpy as np
 # This class serves as a wrapper around a keras model.  Then, instead of calling keras_model.fit, just call
 # SplitGD.fit.  To use this class, just subclass it and write your own code for the "modify_gradients" method.
 
-class SplitGD():
+
+class SplitGD:
 
     def __init__(self, keras_model):
         self.model = keras_model
 
     # Subclass this with something useful.
-    def modify_gradients(self,gradients):   return gradients
+    def modify_gradients(self, gradients, TD_error):
+
+        return gradients
 
     # This returns a tensor of losses, OR the value of the averaged tensor.  Note: use .numpy() to get the
     # value of a tensor.
-    def gen_loss(self,features,targets,avg=False):
+    def gen_loss(self, features, targets, avg=False):
         predictions = self.model(features)  # Feed-forward pass to produce outputs/predictions
-        loss = self.model.loss_functions[0](targets,predictions)
+        loss = self.model.loss_functions[0](targets, predictions)
         return tf.reduce_mean(loss).numpy() if avg else loss
 
     def fit(self, features, targets, epochs=1, mbs=1, vfrac=0.1, verbose=True):
@@ -32,13 +35,14 @@ class SplitGD():
         for _ in range(epochs):
             for _ in range(math.floor(epochs / mbs)):
                 with tf.GradientTape() as tape:  # Read up on tf.GradientTape !!
-                    feaset,tarset = gen_random_minibatch(train_ins, train_targs, mbs=mbs)
-                    loss = self.gen_loss(feaset,tarset,avg=False)
-                    gradients = tape.gradient(loss,params)
-                    gradients = self.modify_gradients(gradients)
-                    self.model.optimizer.apply_gradients(zip(gradients,params))
-            if verbose: self.end_of_epoch_display(train_ins, train_targs, val_ins, val_targs)
-
+                    feaset, tarset = gen_random_minibatch(train_ins, train_targs, mbs=mbs)
+                    loss = self.gen_loss(feaset, tarset, avg=False)
+                    gradients = tape.gradient(loss, params)
+                    gradients = self.modify_gradients(gradients, tarset - self.model.predict(feaset))
+                    self.model.optimizer.apply_gradients(zip(gradients, params))
+            if verbose:
+                # self.end_of_epoch_display(train_ins, train_targs, val_ins, val_targs)
+                pass
     # Use the 'metric' to run a quick test on any set of features and targets.  A typical metric is some form of
     # 'accuracy', such as 'categorical_accuracy'.  Read up on Keras.metrics !!
     # Note that the model.metrics__names slot includes the name of the loss function (as 0th entry),

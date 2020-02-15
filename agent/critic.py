@@ -1,7 +1,8 @@
-from keras.layers import *
-from keras import Model, optimizers
+from tensorflow.keras.layers import *
+from tensorflow.keras import Model, optimizers
 import numpy as np
 from agent.splitgd import SplitGD
+import tensorflow as tf
 
 
 class Critic:
@@ -46,7 +47,7 @@ class Critic:
         Update eligibility with discount and decay
         """
         self.eligibility[state] = (
-            self.discount_factor * self.eligibility_decay * self.eligibility[state]
+                self.discount_factor * self.eligibility_decay * self.eligibility[state]
         )
 
     def calculate_TD_error(self, state, succ_state, reward):
@@ -54,9 +55,9 @@ class Critic:
         Calculates TD error
         """
         TD_error = (
-            reward
-            + self.discount_factor * self.value_function[succ_state]
-            - self.value_function[state]
+                reward
+                + self.discount_factor * self.value_function[succ_state]
+                - self.value_function[state]
         )
         return TD_error
 
@@ -65,12 +66,11 @@ class Critic:
         Update the value function for a state
         """
         self.value_function[state] += (
-            self.learning_rate * TD_error * self.eligibility[state]
+                self.learning_rate * TD_error * self.eligibility[state]
         )
 
 
 class CriticNN(Critic, SplitGD):
-
     """
     Input as bit vector
     Target = r + discount_factor * V(s')
@@ -82,9 +82,13 @@ class CriticNN(Critic, SplitGD):
     """
 
     def __init__(self, cfg, init_state):
-        super(CriticNN, self).__init__(cfg)
         self.dimensions = cfg["critic"]["dimensions"]  # List
-        self.model = self.build_model(init_state)
+
+        model = self.build_model(init_state)
+        Critic.__init__(self, cfg)
+        SplitGD.__init__(self, model)
+
+        self.eligibility = []
 
     def generate_state(self, state):
         """ Creates a numpy array of state """
@@ -95,28 +99,58 @@ class CriticNN(Critic, SplitGD):
         return array
 
     def build_model(self, init_state):
-
+        """
+        Build Keras model
+        """
         state = self.generate_state(init_state)
+
         num_layers = len(self.dimensions)
         inp = Input(shape=state.shape)
         x = inp
 
         for i in range(num_layers):
-            x = Dense(self.dimensions[i], activation='relu')(x)
+            x = Dense(self.dimensions[i], activation='sigmoid')(x)
 
         sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
         model = Model(inp, x)
         model.compile(loss='mean_squared_error', optimizer=sgd)
-
+        model.summary()
         return model
 
-    def reset_eligibility(self):
+    def calculate_TD_error(self, state, succ_state, reward):
 
+        state = self.generate_state(state)
+        state = np.expand_dims(state, axis=0)
+
+        succ_state = self.generate_state(succ_state)
+        succ_state = np.expand_dims(succ_state, axis=0)
+
+        value_function_state = self.model.predict(state)[0, 0]
+        value_function_succ_state = self.model.predict(succ_state)[0, 0]
+        print(value_function_state)
+
+        TD_error = min(1, (
+                reward
+                + self.discount_factor * value_function_succ_state
+                - value_function_state)
+        )
+        print('TD error', TD_error)
+        return TD_error
+
+    def reset_eligibility(self):
+        for weights in self.model.trainable_weights:
+            self.eligibility.append(tf.zeros_like(weights))
+
+    def modify_gradients(self, gradients, TD_error):
+        for i in range(len(gradients)):
+            self.eligibility[i] = tf.add(self.eligibility[i], gradients[i])
+            gradients[i] = self.learning_rate * self.eligibility[i] * TD_error[0]
+        return gradients
 
     def update_value_function(self, state, TD_error):
+        state = self.generate_state(state)
+        state = np.expand_dims(state, axis=0)
+        target = TD_error + self.model.predict(state)
 
-        SplitGD(keras_model=self.model)
-        SplitGD.fit()
+        self.fit(state, target)
 
-    def modify_gradients(self, gradients):
-        pass
