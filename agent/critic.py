@@ -1,7 +1,8 @@
 from keras.layers import *
 from keras import Model, optimizers
-from agent.splitgd import SplitGD
 import numpy as np
+from agent.splitgd import SplitGD
+
 
 class Critic:
     """
@@ -24,7 +25,7 @@ class Critic:
         """
         Initialize V(s) to 0 if it does not already exist in V()
         """
-        if not self.value_function.get(state):
+        if self.value_function.get(state) is None:
             self.value_function[state] = 0
 
     def reset_eligibility(self):
@@ -80,9 +81,10 @@ class CriticNN(Critic, SplitGD):
     Weight update w_i = w_I + learning rate * TDerror * e_i
     """
 
-    def __init__(self, cfg):
+    def __init__(self, cfg, init_state):
         super(CriticNN, self).__init__(cfg)
         self.dimensions = cfg["critic"]["dimensions"]  # List
+        self.model = self.build_model(init_state)
 
     def generate_state(self, state):
         """ Creates a numpy array of state """
@@ -93,8 +95,8 @@ class CriticNN(Critic, SplitGD):
         return array
 
     def build_model(self, init_state):
+
         state = self.generate_state(init_state)
-        print(state.shape[0])
         num_layers = len(self.dimensions)
         inp = Input(shape=state.shape)
         x = inp
@@ -103,12 +105,18 @@ class CriticNN(Critic, SplitGD):
             x = Dense(self.dimensions[i], activation='relu')(x)
 
         sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
-
-        model = Model([inp, x])
+        model = Model(inp, x)
         model.compile(loss='mean_squared_error', optimizer=sgd)
 
-        # Connect to splitGD
-        self.keras_model = model
+        return model
+
+    def reset_eligibility(self):
+
+
+    def update_value_function(self, state, TD_error):
+
+        SplitGD(keras_model=self.model)
+        SplitGD.fit()
 
     def modify_gradients(self, gradients):
         pass

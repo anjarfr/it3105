@@ -23,7 +23,7 @@ class Actor:
         Initializes policy of state, if not already in the policy
         """
         for action in possible_actions:
-            if self.policy.get((state, action)) == None:
+            if self.policy.get((state, action)) is None:
                 self.policy[(state, action)] = 0
 
     def reset_eligibilities(self):
