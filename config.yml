@@ -16,7 +16,7 @@ display:
   jump_from_color: 'silver'
   jump_to_color: 'orange'
   frequency: 1
-  display_range: [[999, 1000]] # Which episodes should be visualized?
+  display_range: [[49, 50]] # Which episodes should be visualized?
   timeout: 1000 #seconds
 
 # Agent parameters
@@ -25,7 +25,6 @@ RL_system:
   episodes: 50
 
 critic:
-<<<<<<< Updated upstream
   type: NN #table or NN
   dimensions: [15, 15, 1] # Number of nodes in each layer
   learning_rate: 0.01 # If NN is used, lr for critic should be much lower than for actor

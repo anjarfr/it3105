@@ -144,7 +144,7 @@ class CriticNN(Critic, SplitGD):
     def modify_gradients(self, gradients, TD_error):
         for i in range(len(gradients)):
             self.eligibility[i] = tf.add(self.eligibility[i], gradients[i])
-            gradients[i] = self.learning_rate * self.eligibility[i] * TD_error[0]
+            gradients[i] = gradients[i] + self.learning_rate * TD_error[0] * self.eligibility[i]
         return gradients
 
     def update_value_function(self, state, TD_error):
@@ -154,12 +154,5 @@ class CriticNN(Critic, SplitGD):
 
         self.fit(state, target)
 
-
     def derivate_V(self, w_i):
-        pass
-
-    def modify_gradients(self, gradients):
-        print(gradients)
-
-    def update_value_function(self, state, TD_error):
         pass
