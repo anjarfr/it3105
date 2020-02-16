@@ -93,6 +93,7 @@ class CriticNN(Critic, SplitGD):
 
         self.model = NN_Model(self.dimensions, state.shape)
         self.model.init_network()
+
         self.eligibility = {}
 
     def generate_state(self, state):
