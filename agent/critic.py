@@ -143,14 +143,15 @@ class CriticNN(Critic, SplitGD):
     def reset_eligibility(self):
         for i in range(len(self.model.trainable_weights)):
             weights = self.model.trainable_weights[i].numpy()
-            self.eligibility[i] = tf.zeros_like(weights)
+            self.eligibility[i] = [0 for x in range(weights.shape[0])]
 
     def modify_gradients(self, gradients, TD_error):
         for i in range(len(gradients)):
             gradient = gradients[i].numpy()
             for j in range(gradient.shape[0]):
-                self.eligibility[i].assign(tf.add(self.eligibility[i][j], gradient[0]))
-                gradients[i][0] = gradients[i][0] + self.learning_rate * TD_error[0] * self.eligibility[i][j]
+                self.eligibility[i][j] = self.eligibility[i][j] + gradient[j]
+                print(gradients)
+                gradients[i][j, :] = gradients[i][j, :] + self.learning_rate * TD_error[0] * self.eligibility[i][j]
         return gradients
 
     def update_value_function(self, state, TD_error, reward, succ_state):
