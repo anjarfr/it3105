@@ -83,7 +83,6 @@ class CriticNN(Critic, SplitGD):
 
     def __init__(self, cfg, init_state):
         self.dimensions = cfg["critic"]["dimensions"]  # List
-
         model = self.build_model(init_state)
         Critic.__init__(self, cfg)
         SplitGD.__init__(self, model)
@@ -103,7 +102,6 @@ class CriticNN(Critic, SplitGD):
         Build Keras model
         """
         state = self.generate_state(init_state)
-
         num_layers = len(self.dimensions)
         inp = Input(shape=state.shape)
         x = inp
@@ -112,7 +110,9 @@ class CriticNN(Critic, SplitGD):
             x = Dense(self.dimensions[i], activation='sigmoid')(x)
 
         sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+
         model = Model(inp, x)
+
         model.compile(loss='mean_squared_error', optimizer=sgd)
         model.summary()
         return model
@@ -154,3 +154,12 @@ class CriticNN(Critic, SplitGD):
 
         self.fit(state, target)
 
+
+    def derivate_V(self, w_i):
+        pass
+
+    def modify_gradients(self, gradients):
+        print(gradients)
+
+    def update_value_function(self, state, TD_error):
+        pass

@@ -25,7 +25,8 @@ RL_system:
   episodes: 50
 
 critic:
-  type: NN #table
+<<<<<<< Updated upstream
+  type: NN #table or NN
   dimensions: [15, 15, 1] # Number of nodes in each layer
   learning_rate: 0.01 # If NN is used, lr for critic should be much lower than for actor
   eligibility_decay: 0.9 # Range [0,1]

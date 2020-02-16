@@ -54,7 +54,7 @@ class SplitGD:
         predictions = self.model(features)
         evaluation = self.model.metrics[index](targets, predictions)
         #  Note that this returns both a tensor (or value) and the NAME of the metric
-        return (tf.reduce_mean(evaluation).numpy() if avg else evaluation, self.model.metrics_names[index + 1])
+        return tf.reduce_mean(evaluation).numpy() if avg else evaluation, self.model.metrics_names[index + 1]
 
     def status_display(self, features, targets, mode='Train'):
         print(mode + ' *** ', end='')

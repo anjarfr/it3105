@@ -41,10 +41,9 @@ class Player:
         critic_type = cfg["critic"]["type"]
         if critic_type == "table":
             critic = Critic(cfg)
-        if critic_type == "NN":
+        if critic_type == "nn" or critic_type == "NN":
             self.table_critic = False
-            init_state = self.game.board.generate_state()
-            critic = CriticNN(cfg, init_state)
+            critic = CriticNN(cfg, self.game.board.generate_state())
         return critic
 
     def play_game(self):
