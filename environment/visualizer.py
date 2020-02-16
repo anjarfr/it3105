@@ -15,7 +15,7 @@ class Visualizer:
         self.filled_color = display_options["filled_color"]
         self.start_color = display_options["jump_from_color"]
         self.end_color = display_options["jump_to_color"]
-        self.timeout = display_options["timeout"]
+        self.delay = display_options["delay"]
         self.diplay_range = self.create_display_range(display_options["display_range"])
 
         self.nodes = self.get_nodes()
@@ -120,9 +120,11 @@ class Visualizer:
         fig = plt.figure(figsize=(10, 10))
 
         timer = fig.canvas.new_timer(
-            interval=self.timeout
+            interval=self.delay
         )  # creating a timer object and setting an interval of 3000 milliseconds
         timer.add_callback(self.close_event)
+
+        plt.pause(self.delay)
 
         nx.draw_networkx(
             self.graph,
@@ -133,6 +135,5 @@ class Visualizer:
         )
 
         plt.axis("off")
-        #timer.start()
 
         plt.show()

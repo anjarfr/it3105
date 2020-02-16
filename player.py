@@ -1,7 +1,9 @@
+import matplotlib.pyplot as plt
 import yaml
-from environment.game import Peg, Hex
+
 from agent.actor import Actor
 from agent.critic import Critic, CriticNN
+from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
 
 with open("config.yml", "r") as ymlfile:
@@ -28,6 +30,8 @@ class Player:
         self.visualizer = Visualizer(
             self.game.board, self.game.size, self.game.shape, cfg["display"]
         )
+        self.remaining_pegs = []
+        self.iterations = []
 
     def initialize_game(self):
         game_type = cfg["game"]["type"]
@@ -46,10 +50,27 @@ class Player:
             critic = CriticNN(cfg, self.game.board.generate_state())
         return critic
 
-    def play_game(self):
+    def plot_pegs(self):
+        plt.plot(self.iterations, self.remaining_pegs)
+        plt.xlabel('Episode')
+        plt.ylabel('Remaining pegs')
+        plt.show()
 
-        if cfg["display"]["frequency"] != 0:
-            self.visualizer.fill_nodes(self.game.board.get_filled_cells())
+    def play_final_game(self):
+        self.game = self.initialize_game()
+        self.visualizer.fill_nodes(self.game.board.get_filled_cells())
+
+        while not self.game.is_finished():
+            state = self.game.board.generate_state()  # String with state
+            possible_actions = self.game.get_all_legal_actions()  # List of actions [(from), (to)]
+            action = self.actor.choose_action(state, possible_actions, epsilon_greedy=False)
+            self.game.perform_action(action)
+            self.visualizer.fill_nodes(
+                self.game.board.get_filled_cells(), action[0], action[1]
+            )
+
+
+    def play_game(self):
 
         wins = 0
 
@@ -129,15 +150,6 @@ class Player:
                     self.actor.update_policy(state, action, TD_error)
                     self.actor.update_eligibility(state, action)
 
-                """ Visualize board """
-                if i in self.visualizer.diplay_range and cfg["display"]["frequency"] != 0:
-                    if step % cfg["display"]["frequency"] == 0:
-                        self.visualizer.fill_nodes(
-                            self.game.board.get_filled_cells(), action[0], action[1]
-                        )
-
-                step += 1
-
                 state = succ_state
                 if succ_action:
                     action = succ_action
@@ -145,20 +157,20 @@ class Player:
             pegs = self.game.get_pegs()
             if pegs == 1: wins += 1
 
-            print(i, ": ", self.game.get_pegs(), ' pegs were left')
+            print(i, ": ", pegs, ' pegs were left')
+            self.remaining_pegs.append(pegs)
+            self.iterations.append(i)
 
         print('Number of wins: ', wins)
 
-    def visualize_target_policy(self):
-        """
-        After training, visualize a game played using the final policy
-        """
-        pass
+        self.play_final_game()
+        self.plot_pegs()
 
 
 def main():
     player = Player()
     player.play_game()
+
 
 if __name__ == "__main__":
     main()

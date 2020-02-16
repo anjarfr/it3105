@@ -1,13 +1,13 @@
 # Environment parameters
 
 board:
-  size: 3
+  size: 4
   shape: diamond #diamond
 
 game:
   type: Peg #Hex
   open_cells: 1
-  open_positions: [[2,2]]
+  open_positions: [[3,1]]
 
 display:
   node_size: 1500
@@ -16,24 +16,24 @@ display:
   jump_from_color: 'silver'
   jump_to_color: 'orange'
   frequency: 1
-  display_range: [[49, 50]] # Which episodes should be visualized?
-  timeout: 1000 #seconds
+  display_range: [[499, 500]] # Which episodes should be visualized?
+  delay: 0.5 #seconds
 
 # Agent parameters
 
 RL_system:
-  episodes: 50
+  episodes: 500
 
 critic:
-  type: NN #table or NN
+  type: table #table or NN
   dimensions: [15, 15, 15, 1] # Number of nodes in each layer
-  learning_rate: 0.001 # If NN is used, lr for critic should be much lower than for actor
-  eligibility_decay: 0.1 # Range [0,1]
-  discount_factor: 0.1 # Range [0,1]
+  learning_rate: 0.1 # If NN is used, lr for critic should be much lower than for actor
+  eligibility_decay: 0.99 # Range [0,1]
+  discount_factor: 0.99 # Range [0,1]
 
 actor:
   learning_rate: 0.5
   eligibility_decay: 0.9 # Range [0,1]
   discount_factor: 0.9 # Range [0,1]
-  init_epsilon: 1
-  epsilon_decay_rate: 0.99999
+  init_epsilon: 0.5
+  epsilon_decay_rate: 0.9999
