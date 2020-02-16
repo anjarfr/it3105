@@ -122,7 +122,7 @@ class Player:
                     state = SAP[0]
                     action = SAP[1]
 
-                    self.critic.update_value_function(state, TD_error)
+                    self.critic.update_value_function(state, TD_error, reward, succ_state)
                     if self.table_critic:
                         self.critic.update_eligibility(state)
 

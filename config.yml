@@ -1,13 +1,13 @@
 # Environment parameters
 
 board:
-  size: 5
-  shape: triangle #diamond
+  size: 3
+  shape: diamond #diamond
 
 game:
   type: Peg #Hex
   open_cells: 1
-  open_positions: [[2,1]]
+  open_positions: [[2,2]]
 
 display:
   node_size: 1500
@@ -26,14 +26,14 @@ RL_system:
 
 critic:
   type: NN #table or NN
-  dimensions: [15, 15, 1] # Number of nodes in each layer
-  learning_rate: 0.01 # If NN is used, lr for critic should be much lower than for actor
-  eligibility_decay: 0.9 # Range [0,1]
-  discount_factor: 0.9 # Range [0,1]
+  dimensions: [15, 15, 15, 1] # Number of nodes in each layer
+  learning_rate: 0.001 # If NN is used, lr for critic should be much lower than for actor
+  eligibility_decay: 0.1 # Range [0,1]
+  discount_factor: 0.1 # Range [0,1]
 
 actor:
   learning_rate: 0.5
   eligibility_decay: 0.9 # Range [0,1]
   discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
-  epsilon_decay_rate: 0.9999
+  epsilon_decay_rate: 0.99999

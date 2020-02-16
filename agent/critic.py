@@ -61,7 +61,7 @@ class Critic:
         )
         return TD_error
 
-    def update_value_function(self, state, TD_error):
+    def update_value_function(self, state, TD_error, reward, succ_state):
         """
         Update the value function for a state
         """
@@ -87,7 +87,7 @@ class CriticNN(Critic, SplitGD):
         Critic.__init__(self, cfg)
         SplitGD.__init__(self, model)
 
-        self.eligibility = []
+        self.eligibility = {}
 
     def generate_state(self, state):
         """ Creates a numpy array of state """
@@ -128,26 +128,38 @@ class CriticNN(Critic, SplitGD):
 
         value_function_state = self.model.predict(state)[0, 0]
         value_function_succ_state = self.model.predict(succ_state)[0, 0]
-        print(value_function_state)
+        print('State value: ', value_function_state, 'Success state value: ', value_function_succ_state)
 
-        TD_error = reward + self.discount_factor * value_function_succ_state - value_function_state
+        TD_error = max(-1,
+                       reward
+                       + self.discount_factor
+                       * value_function_succ_state
+                       - value_function_state
+                       )
 
         print('TD error', TD_error)
         return TD_error
 
     def reset_eligibility(self):
-        for weights in self.model.trainable_weights:
-            self.eligibility.append(tf.zeros_like(weights))
+        for i in range(len(self.model.trainable_weights)):
+            weights = self.model.trainable_weights[i].numpy()
+            self.eligibility[i] = tf.zeros_like(weights)
 
     def modify_gradients(self, gradients, TD_error):
         for i in range(len(gradients)):
-            self.eligibility[i] = tf.add(self.eligibility[i], gradients[i])
-            gradients[i] = self.learning_rate * TD_error[0] * self.eligibility[i]
+            gradient = gradients[i].numpy()
+            for j in range(gradient.shape[0]):
+                self.eligibility[i].assign(tf.add(self.eligibility[i][j], gradient[0]))
+                gradients[i][0] = gradients[i][0] + self.learning_rate * TD_error[0] * self.eligibility[i][j]
         return gradients
 
-    def update_value_function(self, state, TD_error):
+    def update_value_function(self, state, TD_error, reward, succ_state):
         state = self.generate_state(state)
         state = np.expand_dims(state, axis=0)
-        target = TD_error + self.model.predict(state)
+
+        succ_state = self.generate_state(succ_state)
+        succ_state = np.expand_dims(succ_state, axis=0)
+
+        target = reward + self.discount_factor * self.model.predict(succ_state)
 
         self.fit(state, target)
