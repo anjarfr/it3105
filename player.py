@@ -159,8 +159,6 @@ class Player:
 def main():
     player = Player()
     player.play_game()
-    # cNN = CriticNN(cfg)
-    # cNN.build_model('01010101010101')
 
 if __name__ == "__main__":
     main()
