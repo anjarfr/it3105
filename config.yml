@@ -15,8 +15,6 @@ display:
   filled_color: 'plum'
   jump_from_color: 'silver'
   jump_to_color: 'orange'
-  frequency: 1
-  display_range: [[499, 500]] # Which episodes should be visualized?
   delay: 0.5 #seconds
 
 # Agent parameters

@@ -16,7 +16,6 @@ class Visualizer:
         self.start_color = display_options["jump_from_color"]
         self.end_color = display_options["jump_to_color"]
         self.delay = display_options["delay"]
-        self.diplay_range = self.create_display_range(display_options["display_range"])
 
         self.nodes = self.get_nodes()
         self.positions = self.get_positions()

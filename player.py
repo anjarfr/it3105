@@ -95,9 +95,6 @@ class Player:
             state = init_state  # String
             action = init_action  # Tuple of tuple
 
-            """ Step counter for display frequency """
-            step = 0
-
             """ Play game until termination """
             while not self.game.is_finished():
 
