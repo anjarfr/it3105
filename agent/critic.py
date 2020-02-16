@@ -99,7 +99,7 @@ class CriticNN(Critic, SplitGD):
 
     def build_model(self, init_state):
         """
-        Build Keras model
+        Build Keras model with input dimensions as the board state
         """
         state = self.generate_state(init_state)
         num_layers = len(self.dimensions)
@@ -118,6 +118,7 @@ class CriticNN(Critic, SplitGD):
         return model
 
     def calculate_TD_error(self, state, succ_state, reward):
+        """  """
 
         state = self.generate_state(state)
         state = np.expand_dims(state, axis=0)
@@ -129,11 +130,8 @@ class CriticNN(Critic, SplitGD):
         value_function_succ_state = self.model.predict(succ_state)[0, 0]
         print(value_function_state)
 
-        TD_error = min(1, (
-                reward
-                + self.discount_factor * value_function_succ_state
-                - value_function_state)
-        )
+        TD_error = reward + self.discount_factor * value_function_succ_state - value_function_state
+
         print('TD error', TD_error)
         return TD_error
 
@@ -144,7 +142,7 @@ class CriticNN(Critic, SplitGD):
     def modify_gradients(self, gradients, TD_error):
         for i in range(len(gradients)):
             self.eligibility[i] = tf.add(self.eligibility[i], gradients[i])
-            gradients[i] = self.learning_rate * self.eligibility[i] * TD_error[0]
+            gradients[i] = self.learning_rate * TD_error[0] * self.eligibility[i]
         return gradients
 
     def update_value_function(self, state, TD_error):
@@ -153,13 +151,3 @@ class CriticNN(Critic, SplitGD):
         target = TD_error + self.model.predict(state)
 
         self.fit(state, target)
-
-
-    def derivate_V(self, w_i):
-        pass
-
-    def modify_gradients(self, gradients):
-        print(gradients)
-
-    def update_value_function(self, state, TD_error):
-        pass

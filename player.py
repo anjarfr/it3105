@@ -91,7 +91,7 @@ class Player:
                 """ Add performed action to SAP history"""
                 self.SAP_history.append((state, action))
 
-                """ Dynamically update value function and policy as new """
+                """ Dynamically update value function if succ_state is never seen before """
                 if self.table_critic:
                     self.critic.initialize_value_function(succ_state)
 
@@ -100,6 +100,10 @@ class Player:
 
                 succ_action = None
                 if len(possible_succ_actions) > 0:
+                    """
+                    If succ_state has any legal actions:
+                    Dynamically update value function of succ_state and its possible actions
+                    """
                     self.actor.initialize_policy(succ_state, possible_succ_actions)
                     succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
 
@@ -109,10 +113,11 @@ class Player:
                 """ Compute TD error """
                 TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
 
-                """ Set current state eligibility to 1 """
+                """ Set eligibility of current state to 1 (gets all the reward or punishment) """
                 if self.table_critic:
                     self.critic.set_current_eligibility(state)
 
+                """ Update the eligibility traces for the path taken up to this point """
                 for SAP in self.SAP_history:
                     state = SAP[0]
                     action = SAP[1]
@@ -124,6 +129,7 @@ class Player:
                     self.actor.update_policy(state, action, TD_error)
                     self.actor.update_eligibility(state, action)
 
+                """ Visualize board """
                 if i in self.visualizer.diplay_range and cfg["display"]["frequency"] != 0:
                     if step % cfg["display"]["frequency"] == 0:
                         self.visualizer.fill_nodes(
