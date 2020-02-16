@@ -3,6 +3,7 @@ from tensorflow.keras import Model, optimizers
 import numpy as np
 from agent.splitgd import SplitGD
 import tensorflow as tf
+from NN import *
 
 
 class Critic:
@@ -83,10 +84,15 @@ class CriticNN(Critic, SplitGD):
 
     def __init__(self, cfg, init_state):
         self.dimensions = cfg["critic"]["dimensions"]  # List
-        model = self.build_model(init_state)
+        # model = self.build_model(init_state)
         Critic.__init__(self, cfg)
-        SplitGD.__init__(self, model)
+        # SplitGD.__init__(self, model)
 
+
+        state = self.generate_state(init_state)
+
+        self.model = NN_Model(self.dimensions, state.shape)
+        self.model.init_network()
         self.eligibility = {}
 
     def generate_state(self, state):
@@ -94,7 +100,7 @@ class CriticNN(Critic, SplitGD):
         listed_state = []
         for c in state:
             listed_state.append(int(c))
-        array = np.array(listed_state)
+        array = np.array(listed_state, dtype=float)
         return array
 
     def build_model(self, init_state):
@@ -121,13 +127,13 @@ class CriticNN(Critic, SplitGD):
         """  """
 
         state = self.generate_state(state)
-        state = np.expand_dims(state, axis=0)
+        #state = np.expand_dims(state, axis=0)
 
         succ_state = self.generate_state(succ_state)
-        succ_state = np.expand_dims(succ_state, axis=0)
+        #succ_state = np.expand_dims(succ_state, axis=0)
 
-        value_function_state = self.model.predict(state)[0, 0]
-        value_function_succ_state = self.model.predict(succ_state)[0, 0]
+        value_function_state = self.model.forward(state)
+        value_function_succ_state = self.model.forward(succ_state)
         print('State value: ', value_function_state, 'Success state value: ', value_function_succ_state)
 
         TD_error = max(-1,
@@ -140,11 +146,13 @@ class CriticNN(Critic, SplitGD):
         print('TD error', TD_error)
         return TD_error
 
+    """
     def reset_eligibility(self):
         for i in range(len(self.model.trainable_weights)):
             weights = self.model.trainable_weights[i].numpy()
             self.eligibility[i] = tf.zeros_like(weights)
-
+    """
+    """
     def modify_gradients(self, gradients, TD_error):
         for i in range(len(gradients)):
             gradient = gradients[i].numpy()
@@ -152,7 +160,22 @@ class CriticNN(Critic, SplitGD):
                 self.eligibility[i].assign(tf.add(self.eligibility[i][j], gradient[0]))
                 gradients[i][0] = gradients[i][0] + self.learning_rate * TD_error[0] * self.eligibility[i][j]
         return gradients
+    """
 
+    def reset_eligibility(self, state):
+        for
+            self.eligibility[state] = 0
+
+    def update_value_function(self, state, TD_error, reward, succ_state):
+        output = self.model.forward(state)
+        target = reward + self.discount_factor * self.model.forward(succ_state)
+        loss = self.model.lossfunc(output, target)
+
+        loss.backward()
+        self.model.gradient(self.eligibility[state], TD_error, self.learning_rate)
+        self.model.optimfunc(self.learning_rate)
+
+    """
     def update_value_function(self, state, TD_error, reward, succ_state):
         state = self.generate_state(state)
         state = np.expand_dims(state, axis=0)
@@ -163,3 +186,4 @@ class CriticNN(Critic, SplitGD):
         target = reward + self.discount_factor * self.model.predict(succ_state)
 
         self.fit(state, target)
+    """
