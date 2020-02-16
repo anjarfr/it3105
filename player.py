@@ -51,7 +51,7 @@ class Player:
         if cfg["display"]["frequency"] != 0:
             self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
-        wins = 0
+        wins =0
 
         """ New game """
         for i in range(self.episodes):
