@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import time
 
 class Visualizer:
     """ Creates a graphical representation of the game state """
@@ -110,20 +109,11 @@ class Visualizer:
 
         self.display_board()
 
-    def close_event(self):
-        plt.close()  # timer calls this function after 3 seconds and closes the window
-
     def display_board(self):
         """ Displays the board """
 
         fig = plt.figure(figsize=(10, 10))
 
-        timer = fig.canvas.new_timer(
-            interval=self.delay
-        )  # creating a timer object and setting an interval of 3000 milliseconds
-        timer.add_callback(self.close_event)
-
-        plt.pause(self.delay)
 
         nx.draw_networkx(
             self.graph,
@@ -134,5 +124,5 @@ class Visualizer:
         )
 
         plt.axis("off")
-
         plt.show()
+        plt.pause(self.delay)
