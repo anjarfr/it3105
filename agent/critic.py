@@ -1,8 +1,9 @@
-from tensorflow.keras.layers import *
-from tensorflow.keras import Model, optimizers
 import numpy as np
-from agent.splitgd import SplitGD
 import tensorflow as tf
+from tensorflow.keras import Model, optimizers
+from tensorflow.keras.layers import *
+
+from agent.splitgd import SplitGD
 
 
 class Critic:
@@ -61,7 +62,7 @@ class Critic:
         )
         return TD_error
 
-    def update_value_function(self, state, TD_error, reward, succ_state):
+    def update_value_function(self, state, TD_error, reward=0, succ_state=None):
         """
         Update the value function for a state
         """
@@ -82,6 +83,7 @@ class CriticNN(Critic, SplitGD):
     """
 
     def __init__(self, cfg, init_state):
+        super(CriticNN, self).__init__(cfg)
         self.dimensions = cfg["critic"]["dimensions"]  # List
         model = self.build_model(init_state)
         Critic.__init__(self, cfg)
@@ -109,7 +111,7 @@ class CriticNN(Critic, SplitGD):
         for i in range(num_layers):
             x = Dense(units=self.dimensions[i], activation='sigmoid')(x)
 
-        sgd = optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True)
+        sgd = optimizers.SGD(lr=self.learning_rate, decay=1e-6, momentum=0.9, nesterov=True)
 
         model = Model(inp, x)
 
@@ -143,18 +145,40 @@ class CriticNN(Critic, SplitGD):
     def reset_eligibility(self):
         for i in range(len(self.model.trainable_weights)):
             weights = self.model.trainable_weights[i].numpy()
-            self.eligibility[i] = [0 for x in range(weights.shape[0])]
+            self.eligibility[i] = np.zeros(weights.shape)
+        print(self.eligibility)
 
     def modify_gradients(self, gradients, TD_error):
+        evaluated_gradients = []
         for i in range(len(gradients)):
-            gradient = gradients[i].numpy()
-            for j in range(gradient.shape[0]):
-                self.eligibility[i][j] = self.eligibility[i][j] + gradient[j]
-                print(gradients)
-                gradients[i][j, :] = gradients[i][j, :] + self.learning_rate * TD_error[0] * self.eligibility[i][j]
+            gradient_layer = gradients[i].numpy()
+            for j in range(gradient_layer.shape[0]):
+                for k in range(gradient_layer[j].shape[0]):
+                    self.eligibility[i][j, k] = self.discount_factor * self.eligibility_decay * self.eligibility[i][j, k] + \
+                                         gradient_layer[j, k]
+                    gradient_layer[j, k] = gradient_layer[j, k] + self.learning_rate * TD_error * self.eligibility[i][j, k]
+                evaluated_gradients[i] = gradient_layer[j]
+        gradients = tf.convert_to_tensor(evaluated_gradients)
         return gradients
 
+        """
+        for i in range(len(gradients)):
+            with tf.compat.v1.Session() as sess:
+                sess.run(tf.compat.v1.global_variables_initializer())
+                gradient = tf.Variable(gradients[i].numpy())
+                for j in range(gradient.shape[0]):
+                    print(gradient)
+                    self.eligibility[i][j] = self.eligibility[i][j] + gradient[:i, :j].eval()
+                    op = gradient[:i, :j].assign(gradient[:i, :j] + self.learning_rate * TD_error[0] * self.eligibility[i][j])
+                    sess.run(op)
+                    print(gradient)
+            op2 = gradients[i].assign(gradient)
+            sess.run(op2)
+        return gradients
+        """
+
     def update_value_function(self, state, TD_error, reward, succ_state):
+
         state = self.generate_state(state)
         state = np.expand_dims(state, axis=0)
 
