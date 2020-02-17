@@ -146,19 +146,23 @@ class CriticNN(Critic, SplitGD):
         for i in range(len(self.model.trainable_weights)):
             weights = self.model.trainable_weights[i].numpy()
             self.eligibility[i] = np.zeros(weights.shape)
-        print(self.eligibility)
 
     def modify_gradients(self, gradients, TD_error):
         evaluated_gradients = []
         for i in range(len(gradients)):
             gradient_layer = gradients[i].numpy()
-            for j in range(gradient_layer.shape[0]):
-                for k in range(gradient_layer[j].shape[0]):
+            for j in range(int(gradient_layer.shape[0])):
+                if j == gradient_layer.shape[0]:
+                    shape = gradient_layer[j].shape
+                else:
+                    print(gradient_layer[j].shape[0])
+                    shape = gradient_layer[j].shape[0]
+                for k in range(shape):
                     self.eligibility[i][j, k] = self.discount_factor * self.eligibility_decay * self.eligibility[i][j, k] + \
-                                         gradient_layer[j, k]
+                                         gradient_layer.item(j, k)
                     gradient_layer[j, k] = gradient_layer[j, k] + self.learning_rate * TD_error * self.eligibility[i][j, k]
-                evaluated_gradients[i] = gradient_layer[j]
-        gradients = tf.convert_to_tensor(evaluated_gradients)
+            evaluated_gradients.append(gradient_layer[j])
+        gradients = tf.convert_to_tensor(evaluated_gradients, dtype=tf.float32)
         return gradients
 
         """
