@@ -59,7 +59,6 @@ class Actor:
         greedy_number = random.uniform(0, 1)
         chosen_action = next(iter(actions))
 
-
         if len(actions) > 0:
             if epsilon_greedy:
                 if greedy_number < self.epsilon:

@@ -109,9 +109,9 @@ class CriticNN(Critic, SplitGD):
         x = inp
 
         for i in range(num_layers):
-            x = Dense(units=self.dimensions[i], activation='sigmoid')(x)
+            x = Dense(units=self.dimensions[i], activation='tanh')(x)
 
-        sgd = optimizers.SGD(lr=self.learning_rate, decay=1e-6, momentum=0.9, nesterov=True)
+        sgd = optimizers.SGD(lr=self.learning_rate, nesterov=True)
 
         model = Model(inp, x)
 
@@ -130,16 +130,9 @@ class CriticNN(Critic, SplitGD):
 
         value_function_state = self.model.predict(state)[0, 0]
         value_function_succ_state = self.model.predict(succ_state)[0, 0]
-        print('State value: ', value_function_state, 'Success state value: ', value_function_succ_state)
 
-        TD_error = max(-1,
-                       reward
-                       + self.discount_factor
-                       * value_function_succ_state
-                       - value_function_state
-                       )
+        TD_error = max(-1, reward + self.discount_factor * value_function_succ_state - value_function_state)
 
-        print('TD error', TD_error)
         return TD_error
 
     def reset_eligibility(self):
@@ -148,17 +141,16 @@ class CriticNN(Critic, SplitGD):
             self.eligibility.append(np.zeros(weights.shape))
 
     def modify_gradients(self, gradients, TD_error):
-        evaluated_gradients = []
+        updated_gradients = []
         TD_error = TD_error[0][0]
 
         for i in range(len(gradients)):
             self.eligibility[i] = self.discount_factor * self.eligibility_decay * self.eligibility[i]
             self.eligibility[i] = tf.math.add(gradients[i], self.eligibility[i])
-            evaluated_gradients.append(tf.math.scalar_mul(self.learning_rate * TD_error, self.eligibility[i]))
-        return evaluated_gradients
+            updated_gradients.append(tf.math.scalar_mul(self.learning_rate * TD_error, self.eligibility[i]))
+        return updated_gradients
 
     def update_value_function(self, state, TD_error, reward, succ_state):
-
         state = self.generate_state(state)
         state = np.expand_dims(state, axis=0)
 

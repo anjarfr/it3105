@@ -6,6 +6,8 @@ from agent.critic import Critic, CriticNN
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
 
+import timeit
+
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
@@ -56,14 +58,12 @@ class Player:
         plt.ylabel('Remaining pegs')
         plt.show()
 
-    def play_final_game(self):
+    def play_final_game(self, SAP_history):
         self.game = self.initialize_game()
         self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
-        while not self.game.is_finished():
-            state = self.game.board.generate_state()  # String with state
-            possible_actions = self.game.get_all_legal_actions()  # List of actions [(from), (to)]
-            action = self.actor.choose_action(state, possible_actions, epsilon_greedy=False)
+        for sap in SAP_history:
+            action = sap[1]
             self.game.perform_action(action)
             self.visualizer.fill_nodes(
                 self.game.board.get_filled_cells(), action[0], action[1]
@@ -73,9 +73,14 @@ class Player:
     def play_game(self):
 
         wins = 0
+        epsilon_greedy = True
 
         """ New game """
         for i in range(self.episodes):
+
+            if i == self.episodes - 1:
+                print('Switched to following policy')
+                epsilon_greedy = False
 
             """ Reset all elegibilities to 0 """
             self.critic.reset_eligibility()
@@ -87,7 +92,7 @@ class Player:
             init_state = self.game.board.generate_state()  # String with state
             possible_actions = (self.game.get_all_legal_actions())  # List of actions [(from), (to)]
             self.actor.initialize_policy(init_state, possible_actions)  # Creates dictionary {string: tuple of tuple}
-            init_action = self.actor.choose_action(init_state, possible_actions)  # Tuple of tuple
+            init_action = self.actor.choose_action(init_state, possible_actions, epsilon_greedy=epsilon_greedy)  # Tuple of tuple
 
             if self.table_critic:
                 self.critic.initialize_value_function(init_state)  # Creates dictionary {string: value}
@@ -123,7 +128,7 @@ class Player:
                     Dynamically update value function of succ_state and its possible actions
                     """
                     self.actor.initialize_policy(succ_state, possible_succ_actions)
-                    succ_action = self.actor.choose_action(succ_state, possible_succ_actions)  # tuple of tuple
+                    succ_action = self.actor.choose_action(succ_state, possible_succ_actions, epsilon_greedy=epsilon_greedy)  # tuple of tuple
 
                 """ Set eligibility of a and s to 1 """
                 self.actor.set_current_eligibility(state, action)
@@ -160,7 +165,7 @@ class Player:
 
         print('Number of wins: ', wins)
 
-        self.play_final_game()
+        self.play_final_game(self.SAP_history)
         self.plot_pegs()
 
 

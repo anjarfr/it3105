@@ -1,12 +1,11 @@
-# Environment parameters
+# |---------- Environment parameters ----------|
 
 board:
-  size: 4
+  size: 5
   shape: triangle #diamond
 
 game:
   type: Peg #Hex
-  open_cells: 1
   open_positions: [[3,1]]
 
 display:
@@ -17,21 +16,21 @@ display:
   jump_to_color: 'orange'
   delay: 0.5 #seconds
 
-# Agent parameters
+# |---------- Agent parameters ----------|
 
 RL_system:
-  episodes: 100
+  episodes: 200
 
 critic:
   type: NN #table or NN
   dimensions: [15, 15, 1] # Number of nodes in each layer
   learning_rate: 0.001 # If NN is used, lr for critic should be much lower than for actor
-  eligibility_decay: 0.9 # Range [0,1]
-  discount_factor: 0.9 # Range [0,1]
+  eligibility_decay: 0.99 # Range [0,1]
+  discount_factor: 0.99 # Range [0,1]
 
 actor:
-  learning_rate: 0.1
-  eligibility_decay: 0.9 # Range [0,1]
-  discount_factor: 0.9 # Range [0,1]
+  learning_rate: 0.5
+  eligibility_decay: 0.99 # Range [0,1]
+  discount_factor: 0.99 # Range [0,1]
   init_epsilon: 1
   epsilon_decay_rate: 0.999

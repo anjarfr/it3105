@@ -1,6 +1,7 @@
 import math
 import tensorflow as tf
 import numpy as np
+import timeit
 
 # ************** Split Gradient Descent (SplitGD) **********************************
 # This "exposes" the gradients during gradient descent by breaking the call to "fit" into two calls: tape.gradient
