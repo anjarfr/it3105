@@ -16,7 +16,7 @@ class Actor:
         self.eligibility_decay = cfg["actor"]["eligibility_decay"]
         self.discount_factor = cfg["actor"]["discount_factor"]
         self.epsilon = cfg["actor"]["init_epsilon"]
-        self.epsilon_decay = cfg["actor"]["epsilon_decay_rate"]
+        self.epsilon_decay = ( cfg["actor"]["init_epsilon"] - cfg["actor"]["end_epsilon"] ) / cfg["RL_system"]["episodes"]
 
     def initialize_policy(self, state: str, possible_actions):
         """
@@ -82,4 +82,3 @@ class Actor:
         """
         curr_value = self.policy.get((state, action))
         self.policy[(state, action)] = curr_value + self.alpha * td_error * self.eligibility[(state, action)]
-        self.epsilon = self.epsilon * self.epsilon_decay

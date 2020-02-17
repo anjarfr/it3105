@@ -3,6 +3,7 @@ import yaml
 
 from agent.actor import Actor
 from agent.critic import Critic, CriticNN
+from agent.torch_critic import TorchCritic
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
 
@@ -49,7 +50,7 @@ class Player:
             critic = Critic(cfg)
         if critic_type == "nn" or critic_type == "NN":
             self.table_critic = False
-            critic = CriticNN(cfg, self.game.board.generate_state())
+            critic = TorchCritic(cfg, self.game.board.generate_state())
         return critic
 
     def plot_pegs(self):
@@ -155,6 +156,9 @@ class Player:
                 state = succ_state
                 if succ_action:
                     action = succ_action
+
+            # Update epsilon
+            self.actor.epsilon = self.actor.epsilon * (1 - self.actor.epsilon_decay)
 
             pegs = self.game.get_pegs()
             if pegs == 1: wins += 1
