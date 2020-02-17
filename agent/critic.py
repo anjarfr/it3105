@@ -89,7 +89,7 @@ class CriticNN(Critic, SplitGD):
         Critic.__init__(self, cfg)
         SplitGD.__init__(self, model)
 
-        self.eligibility = {}
+        self.eligibility = []
 
     def generate_state(self, state):
         """ Creates a numpy array of state """
@@ -145,41 +145,17 @@ class CriticNN(Critic, SplitGD):
     def reset_eligibility(self):
         for i in range(len(self.model.trainable_weights)):
             weights = self.model.trainable_weights[i].numpy()
-            self.eligibility[i] = np.zeros(weights.shape)
+            self.eligibility.append(np.zeros(weights.shape))
 
     def modify_gradients(self, gradients, TD_error):
         evaluated_gradients = []
-        for i in range(len(gradients)):
-            gradient_layer = gradients[i].numpy()
-            for j in range(int(gradient_layer.shape[0])):
-                if j == gradient_layer.shape[0]:
-                    shape = gradient_layer[j].shape
-                else:
-                    print(gradient_layer[j].shape[0])
-                    shape = gradient_layer[j].shape[0]
-                for k in range(shape):
-                    self.eligibility[i][j, k] = self.discount_factor * self.eligibility_decay * self.eligibility[i][j, k] + \
-                                         gradient_layer.item(j, k)
-                    gradient_layer[j, k] = gradient_layer[j, k] + self.learning_rate * TD_error * self.eligibility[i][j, k]
-            evaluated_gradients.append(gradient_layer[j])
-        gradients = tf.convert_to_tensor(evaluated_gradients, dtype=tf.float32)
-        return gradients
+        TD_error = TD_error[0][0]
 
-        """
         for i in range(len(gradients)):
-            with tf.compat.v1.Session() as sess:
-                sess.run(tf.compat.v1.global_variables_initializer())
-                gradient = tf.Variable(gradients[i].numpy())
-                for j in range(gradient.shape[0]):
-                    print(gradient)
-                    self.eligibility[i][j] = self.eligibility[i][j] + gradient[:i, :j].eval()
-                    op = gradient[:i, :j].assign(gradient[:i, :j] + self.learning_rate * TD_error[0] * self.eligibility[i][j])
-                    sess.run(op)
-                    print(gradient)
-            op2 = gradients[i].assign(gradient)
-            sess.run(op2)
-        return gradients
-        """
+            self.eligibility[i] = self.discount_factor * self.eligibility_decay * self.eligibility[i]
+            self.eligibility[i] = tf.math.add(gradients[i], self.eligibility[i])
+            evaluated_gradients.append(tf.math.scalar_mul(self.learning_rate * TD_error, self.eligibility[i]))
+        return evaluated_gradients
 
     def update_value_function(self, state, TD_error, reward, succ_state):
 
