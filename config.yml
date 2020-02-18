@@ -19,7 +19,7 @@ display:
 # |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 10
+  episodes: 100
 
 critic:
   type: NN #table or NN
@@ -33,4 +33,4 @@ actor:
   eligibility_decay: 0.9 # Range [0,1]
   discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
-  epsilon_decay: 0.002
+  epsilon_decay: 0.95

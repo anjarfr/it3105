@@ -17,7 +17,6 @@ class Actor:
         self.discount_factor = cfg["actor"]["discount_factor"]
         self.epsilon = cfg["actor"]["init_epsilon"]
         self.epsilon_decay = cfg["actor"]["epsilon_decay"]
-        # self.epsilon_decay = (cfg["actor"]["init_epsilon"] - cfg["actor"]["end_epsilon"]) / cfg["actor"]["end_episode"]
 
     def initialize_policy(self, state: str, possible_actions):
         """

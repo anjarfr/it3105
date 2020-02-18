@@ -158,7 +158,7 @@ class Player:
                     action = succ_action
 
             # Update epsilon
-            self.actor.epsilon = self.actor.epsilon * (1 - self.actor.epsilon_decay)
+            self.actor.epsilon = self.actor.epsilon * self.actor.epsilon_decay
 
 
             pegs = self.game.get_pegs()
