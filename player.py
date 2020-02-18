@@ -6,6 +6,7 @@ from agent.critic import Critic, CriticNN
 from agent.torch_critic import TorchCritic
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
+import numpy as np
 
 import timeit
 
@@ -58,6 +59,15 @@ class Player:
         plt.xlabel('Episode')
         plt.ylabel('Remaining pegs')
         plt.show()
+
+    def plot_moving_average(self):
+        window_size = 30
+
+        plt.plot(self.iterations[window_size-1:], np.convolve(self.remaining_pegs, np.ones((window_size, ))/window_size, mode='valid'))
+        plt.xlabel('Episode')
+        plt.ylabel('Remaining pegs (smoothed)')
+        plt.show()
+
 
     def play_final_game(self, SAP_history):
         self.game = self.initialize_game()
@@ -167,7 +177,6 @@ class Player:
                 wins += 1
 
             print(i, ": ", pegs, ' pegs were left. Epsilon: ', self.actor.epsilon)
-            # print("TD error: ", TD_error)
             self.remaining_pegs.append(pegs)
             self.iterations.append(i)
 
@@ -175,6 +184,7 @@ class Player:
 
         self.play_final_game(self.SAP_history)
         self.plot_pegs()
+        self.plot_moving_average()
 
 
 def main():
