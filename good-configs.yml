@@ -1,8 +1,8 @@
 # |---------- Environment parameters ----------|
 
 board:
-  size: 4
-  shape: diamond #diamond
+  size: 5
+  shape: triangle #diamond
 
 game:
   type: Peg #Hex
@@ -14,12 +14,12 @@ display:
   filled_color: 'plum'
   jump_from_color: 'silver'
   jump_to_color: 'orange'
-  delay: 1 #seconds
+  delay: 0.5 #seconds
 
 # |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 10
+  episodes: 1200
 
 critic:
   type: NN #table or NN
@@ -34,3 +34,4 @@ actor:
   discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
   epsilon_decay: 0.002
+

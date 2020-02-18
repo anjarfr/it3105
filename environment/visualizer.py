@@ -20,6 +20,7 @@ class Visualizer:
         self.positions = self.get_positions()
         self.edges = self.get_edges()
         self.node_colors = self.initialize_colors()
+        self.node_sizes = self.node_size
         self.graph = self.initialize_graph()
 
     def create_display_range(self, ranges):
@@ -97,6 +98,8 @@ class Visualizer:
         """
         self.node_colors = self.initialize_colors()
         filled_indexes = [self.nodes.index(node) for node in filled_nodes]
+        self.node_sizes = [self.node_size for i in range(len(self.nodes))]
+
 
         for index in filled_indexes:
             self.node_colors[index] = self.filled_color
@@ -107,19 +110,21 @@ class Visualizer:
             self.node_colors[start] = self.start_color
             self.node_colors[end] = self.end_color
 
+            self.node_sizes[start] = 500
+            self.node_sizes[end] = 3000
+
         self.display_board()
 
     def display_board(self):
         """ Displays the board """
 
-        fig = plt.figure(figsize=(10, 10))
-
+        plt.figure(figsize=(10, 10))
 
         nx.draw_networkx(
             self.graph,
             pos=self.positions,
             node_color=self.node_colors,
-            node_size=self.node_size,
+            node_size=self.node_sizes,
             edgecolors="black",
         )
 

@@ -160,10 +160,15 @@ class Player:
             # Update epsilon
             self.actor.epsilon = self.actor.epsilon * (1 - self.actor.epsilon_decay)
 
+
             pegs = self.game.get_pegs()
-            if pegs == 1: wins += 1
+            if pegs == 1:
+                print("--------------------win---------------------")
+                wins += 1
 
             print(i, ": ", pegs, ' pegs were left')
+            print("Epsilon: ", self.actor.epsilon)
+            print("TD error: ", TD_error)
             self.remaining_pegs.append(pegs)
             self.iterations.append(i)
 
