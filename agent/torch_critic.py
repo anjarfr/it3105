@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 from .critic import Critic
-import numpy as np
 
 torch.manual_seed(42)
+
 
 class TorchCritic(Critic):
 
@@ -12,16 +12,13 @@ class TorchCritic(Critic):
         self.model = TorchNet(cfg, init_state)
 
     def calculate_TD_error(self, state, succ_state, reward):
-        """  """
         state = self.generate_state(state)
         succ_state = self.generate_state(succ_state)
 
         value_function_state = self.model.forward(state)
         value_function_succ_state = self.model.forward(succ_state)
-        # print(value_function_state, value_function_succ_state)
 
         TD_error = reward + self.discount_factor * value_function_succ_state - value_function_state
-        # print('TD error: ', TD_error[0].item())
         return TD_error[0].item()
 
     def reset_eligibility(self):
