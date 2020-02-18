@@ -17,13 +17,13 @@ display:
   jump_from_size: 800
   jump_to_size: 3000
   delay: 0.5 #seconds
-  display_last_game: False # True or False
+  display_last_game: True # True or False
   plot_window_size: 20
 
 # |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 20
+  episodes: 500
 
 critic:
   type: table #table or NN
