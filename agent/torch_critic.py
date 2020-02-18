@@ -11,6 +11,7 @@ class NeuralNetCritic(Critic):
         self.model = TorchNet(cfg, init_state)
 
     def calculate_TD_error(self, state, succ_state, reward):
+        """ Calculates TD error """
         state = self.generate_state(state)
         succ_state = self.generate_state(succ_state)
 
@@ -21,6 +22,7 @@ class NeuralNetCritic(Critic):
         return TD_error[0].item()
 
     def reset_eligibility(self):
+        """ Reset all eligibility traces to 0 """
         for i, layer in enumerate(self.model.eligibility):
             self.model.eligibility[i] = torch.zeros(layer.shape)
 
@@ -33,6 +35,7 @@ class NeuralNetCritic(Critic):
         return tensor
 
     def update_value_function(self, state, TD_error, reward=0, succ_state=None):
+        """ Update gradients of neural net to incorporate eligibility traces """
         state = self.generate_state(state)
         succ_state = self.generate_state(succ_state)
 
@@ -43,6 +46,7 @@ class NeuralNetCritic(Critic):
 
 
 class TorchNet(nn.Module):
+    """ Neural network """
 
     def __init__(self, cfg, init_state):
         super(TorchNet, self).__init__()
@@ -66,10 +70,12 @@ class TorchNet(nn.Module):
         self.initialize_eligibility()
 
     def initialize_eligibility(self):
+        """ Initialize eligibilities of weights and biases in the network to 0 """
         for params in self.parameters():
             self.eligibility.append(torch.zeros(params.shape))
 
     def update(self, prediction, target):
+        """ Modify the gradients in the neural network to incorporate eligibility traces """
         loss = self.loss_func(prediction, target)
         self.zero_grad()
         loss.backward(retain_graph=True)
@@ -80,6 +86,7 @@ class TorchNet(nn.Module):
                 params = params + self.learning_rate * (target - prediction) * self.eligibility[i]
 
     def forward(self, x):
+        """ Compute value of state x """
         for layer in self.layers:
             x = torch.tanh(layer(x))
         return x

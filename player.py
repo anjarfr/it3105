@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 import yaml
 
 from agent.actor import Actor
@@ -6,7 +7,6 @@ from agent.critic import Critic
 from agent.torch_critic import NeuralNetCritic
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
-import numpy as np
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
@@ -55,17 +55,19 @@ class Player:
         return critic
 
     def plot_result(self):
+        """ Plots the remaining pegs after each episode and the moving average """
         window_size = min(cfg["display"]["plot_window_size"], int(self.episodes / 2))
 
         plt.figure()
         plt.plot(self.iterations, self.remaining_pegs, color='#638ed4')
-        plt.plot(self.iterations[int(window_size/2):-int((window_size-1)/2)],
+        plt.plot(self.iterations[int(window_size / 2):-int((window_size - 1) / 2)],
                  np.convolve(self.remaining_pegs, np.ones((window_size,)) / window_size, mode='valid'), color='#003182')
         plt.xlabel('Episode')
         plt.ylabel('Remaining pegs')
         plt.show()
 
     def play_final_game(self, SAP_history):
+        """ Visualize the policy learnt by the agent """
         self.game = self.initialize_game()
         self.visualizer.fill_nodes(self.game.board.get_filled_cells())
 
@@ -77,11 +79,15 @@ class Player:
             )
 
     def reset_eligibilities_and_history(self):
+        """ Reset all eligibilities to 0 at the start of a new game,
+        and reset the path taken from start to end state """
+
         self.critic.reset_eligibility()
         self.actor.reset_eligibilities()
         self.SAP_history = []
 
     def initialize_new_game(self):
+        """ Create a new game for each episode and return the initial state and initial action """
         self.game = self.initialize_game()
         init_state = self.game.board.generate_state()  # String with state
         possible_actions = (self.game.get_all_legal_actions())  # List of actions [(from), (to)]
@@ -91,10 +97,16 @@ class Player:
         if self.table_critic:
             self.critic.initialize_value_function(init_state)  # Creates dictionary {string: value}
 
-        return init_state, init_action, possible_actions
+        return init_state, init_action
 
     def get_reward_and_succ_state(self, state, action):
-        """Initializes value of new states found to 0 at the start of an episode"""
+        """
+        Perform action from state s and bring the game to state s'
+        Updates the critic's value function if critic is a table
+        Returns the reward received and successor state
+        """
+
+        """ Initializes value of new states found to 0 at the start of an episode """
         if self.table_critic:
             self.critic.initialize_value_function(state)
 
@@ -113,6 +125,7 @@ class Player:
 
     def get_succ_action(self, succ_state):
         """ Dictate a' from the current policy for s' """
+
         possible_succ_actions = self.game.get_all_legal_actions()
 
         succ_action = None
@@ -127,14 +140,15 @@ class Player:
         return succ_action
 
     def set_eligibilities_for_current_state(self, state, action):
-        """ Set eligibility of a and s to 1 """
+        """ Set eligibility of a and s to 1 (get all the reward or punishment)"""
         self.actor.set_current_eligibility(state, action)
 
-        """ Set eligibility of current state to 1 (gets all the reward or punishment) """
+        """ Set eligibility of current state to 1 """
         if self.table_critic:
             self.critic.set_current_eligibility(state)
 
     def update_eligibility_traces(self, reward, TD_error, succ_state):
+        """ For each state-action-pairs, update their eligibility """
         for SAP in self.SAP_history:
             state = SAP[0]
             action = SAP[1]
@@ -157,7 +171,7 @@ class Player:
             self.reset_eligibilities_and_history()
 
             """Initialize new game"""
-            init_state, init_action, possible_actions = self.initialize_new_game()
+            init_state, init_action = self.initialize_new_game()
 
             state = init_state  # String
             action = init_action  # Tuple of tuple
@@ -202,5 +216,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

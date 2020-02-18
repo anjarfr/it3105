@@ -36,17 +36,13 @@ class Critic:
         self.eligibility[state] = 1
 
     def update_eligibility(self, state):
-        """
-        Update eligibility with discount and decay
-        """
+        """ Update eligibility with discount and decay """
         self.eligibility[state] = (
                 self.discount_factor * self.eligibility_decay * self.eligibility[state]
         )
 
     def calculate_TD_error(self, state, succ_state, reward):
-        """
-        Calculates TD error
-        """
+        """ Calculates TD error """
         TD_error = (
                 reward
                 + self.discount_factor * self.value_function[succ_state]
