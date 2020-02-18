@@ -2,16 +2,15 @@ import matplotlib.pyplot as plt
 import yaml
 
 from agent.actor import Actor
-from agent.critic import Critic, CriticNN
+from agent.critic import Critic
 from agent.torch_critic import TorchCritic
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
 import numpy as np
 
-import timeit
-
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
+
 
 class Player:
     """
