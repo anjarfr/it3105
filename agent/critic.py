@@ -131,7 +131,7 @@ class CriticNN(Critic, SplitGD):
         value_function_state = self.model.predict(state)[0, 0]
         value_function_succ_state = self.model.predict(succ_state)[0, 0]
 
-        TD_error = max(-1, reward + self.discount_factor * value_function_succ_state - value_function_state)
+        TD_error = reward + self.discount_factor * value_function_succ_state - value_function_state
 
         return TD_error
 

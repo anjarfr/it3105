@@ -150,10 +150,6 @@ class Player:
             self.actor.update_eligibility(state, action)
 
     def play_game(self):
-
-        wins = 0
-
-        """ New game """
         for i in range(self.episodes):
 
             if i == self.episodes - 1:
@@ -190,17 +186,11 @@ class Player:
             self.actor.epsilon = self.actor.epsilon * self.actor.epsilon_decay
 
             pegs = self.game.get_pegs()
-            if pegs == 1:
-                print("--------------------win---------------------")
-                wins += 1
-
             print(i, ": ", pegs, ' pegs were left. Epsilon: ', self.actor.epsilon)
 
             """ Store result for learning plot """
             self.remaining_pegs.append(pegs)
             self.iterations.append(i)
-
-        print('Number of wins: ', wins)
 
         self.play_final_game(self.SAP_history)
         self.plot_pegs()
