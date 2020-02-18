@@ -110,7 +110,7 @@ class Visualizer:
             self.node_colors[start] = self.start_color
             self.node_colors[end] = self.end_color
 
-            self.node_sizes[start] = 500
+            self.node_sizes[start] = 800
             self.node_sizes[end] = 3000
 
         self.display_board()
