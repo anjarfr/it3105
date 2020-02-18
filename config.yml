@@ -1,12 +1,12 @@
 # |---------- Environment parameters ----------|
 
 board:
-  size: 5
-  shape: triangle #diamond
+  size: 4
+  shape: diamond #diamond
 
 game:
   type: Peg #Hex
-  open_positions: [[3,1]]
+  open_positions: [[2,1]]
 
 display:
   node_size: 1500
@@ -16,10 +16,10 @@ display:
   jump_to_color: 'orange'
   delay: 0.5 #seconds
 
-# |---------- Agent parameters ----------|
+# |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 500
+  episodes: 1200
 
 critic:
   type: NN #table or NN
@@ -29,8 +29,9 @@ critic:
   discount_factor: 0.99 # Range [0,1]
 
 actor:
-  learning_rate: 0.5
-  eligibility_decay: 0.99 # Range [0,1]
-  discount_factor: 0.99 # Range [0,1]
+  learning_rate: 0.1
+  eligibility_decay: 0.9 # Range [0,1]
+  discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
   end_epsilon: 0
+  end_episode: 1000

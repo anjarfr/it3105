@@ -18,14 +18,15 @@ class TorchCritic(Critic):
 
         value_function_state = self.model.forward(state)
         value_function_succ_state = self.model.forward(succ_state)
+        # print(value_function_state, value_function_succ_state)
 
         TD_error = reward + self.discount_factor * value_function_succ_state - value_function_state
-
+        # print('TD error: ', TD_error[0].item())
         return TD_error[0].item()
 
     def reset_eligibility(self):
-        for params in self.model.parameters():
-            self.model.eligibility.append(torch.zeros(params.shape))
+        for i, layer in enumerate(self.model.eligibility):
+            self.model.eligibility[i] = torch.zeros(layer.shape)
 
     def generate_state(self, state):
         """ Creates a tensor of state """
@@ -39,8 +40,8 @@ class TorchCritic(Critic):
         state = self.generate_state(state)
         succ_state = self.generate_state(succ_state)
 
-        prediction = self.model(state)
-        target = reward + self.discount_factor * self.model(succ_state)
+        prediction = self.model.forward(state)
+        target = reward + self.discount_factor * self.model.forward(succ_state)
 
         self.model.update(prediction, target)
 
@@ -66,17 +67,23 @@ class TorchNet(nn.Module):
             layers.append(nn.Linear(self.dimensions[i], self.dimensions[i+1]))
         self.layers = nn.ModuleList(layers)
 
+        self.initialize_eligibility()
+
+    def initialize_eligibility(self):
+        for params in self.parameters():
+            self.eligibility.append(torch.zeros(params.shape))
+
     def update(self, prediction, target):
         loss = self.loss_func(prediction, target)
         self.zero_grad()
         loss.backward(retain_graph=True)
 
-        for i, params in enumerate(self.parameters()):
-            self.eligibility[i] = self.discount_factor * self.eligibility_decay * self.eligibility[i] + params.grad.data
-            params.data.add_(self.learning_rate * (target - prediction) * self.eligibility[i])
+        with torch.no_grad():
+            for i, params in enumerate(self.parameters()):
+                self.eligibility[i] = self.discount_factor * self.eligibility_decay * self.eligibility[i] + params.grad.data
+                params = params + self.learning_rate * (target - prediction) * self.eligibility[i]
 
     def forward(self, x):
-        for layer in self.layers[:-1]:
+        for layer in self.layers:
             x = torch.tanh(layer(x))
-        x = self.layers[-1](x)
         return x
