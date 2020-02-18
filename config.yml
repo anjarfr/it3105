@@ -2,10 +2,10 @@
 
 board:
   size: 4
-  shape: diamond #diamond
+  shape: diamond #triangle or diamond
 
 game:
-  type: Peg #Hex
+  type: Peg
   open_positions: [[3,1]]
 
 display:
@@ -14,16 +14,20 @@ display:
   filled_color: 'plum'
   jump_from_color: 'silver'
   jump_to_color: 'orange'
+  jump_from_size: 800
+  jump_to_size: 3000
   delay: 0.5 #seconds
+  display_last_game: False # True or False
+  plot_window_size: 20
 
 # |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 500
+  episodes: 20
 
 critic:
   type: table #table or NN
-  dimensions: [15, 20, 30, 1] # Number of nodes in each layer
+  dimensions: [15, 1] # Number of nodes in each layer
   learning_rate: 0.1 # If NN is used, lr for critic should be much lower than for actor
   eligibility_decay: 0.99 # Range [0,1]
   discount_factor: 0.99 # Range [0,1]

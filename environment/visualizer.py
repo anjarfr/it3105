@@ -14,6 +14,8 @@ class Visualizer:
         self.filled_color = display_options["filled_color"]
         self.start_color = display_options["jump_from_color"]
         self.end_color = display_options["jump_to_color"]
+        self.start_size = display_options["jump_from_size"]
+        self.end_size = display_options["jump_to_size"]
         self.delay = display_options["delay"]
 
         self.nodes = self.get_nodes()
@@ -100,7 +102,6 @@ class Visualizer:
         filled_indexes = [self.nodes.index(node) for node in filled_nodes]
         self.node_sizes = [self.node_size for i in range(len(self.nodes))]
 
-
         for index in filled_indexes:
             self.node_colors[index] = self.filled_color
 
@@ -110,8 +111,8 @@ class Visualizer:
             self.node_colors[start] = self.start_color
             self.node_colors[end] = self.end_color
 
-            self.node_sizes[start] = 800
-            self.node_sizes[end] = 3000
+            self.node_sizes[start] = self.start_size
+            self.node_sizes[end] = self.end_size
 
         self.display_board()
 
@@ -128,6 +129,8 @@ class Visualizer:
             edgecolors="black",
         )
 
+
         plt.axis("off")
         plt.show()
         plt.pause(self.delay)
+

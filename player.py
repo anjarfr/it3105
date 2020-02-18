@@ -13,7 +13,6 @@ import timeit
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
 
-
 class Player:
     """
     Player is responsible for communication between environment and agent
@@ -34,6 +33,7 @@ class Player:
         self.visualizer = Visualizer(
             self.game.board, self.game.size, self.game.shape, cfg["display"]
         )
+        self.display_last_game = cfg["display"]["display_last_game"]
         self.remaining_pegs = []
         self.iterations = []
 
@@ -55,19 +55,15 @@ class Player:
         return critic
 
     def plot_pegs(self):
-        plt.plot(self.iterations, self.remaining_pegs)
+        window_size = min(cfg["display"]["plot_window_size"], int(self.episodes / 2))
+
+        plt.figure()
+        plt.plot(self.iterations, self.remaining_pegs, color='b')
+        plt.plot(self.iterations[int(window_size/2):-int((window_size-1)/2)],
+                 np.convolve(self.remaining_pegs, np.ones((window_size,)) / window_size, mode='valid'), color='r')
         plt.xlabel('Episode')
         plt.ylabel('Remaining pegs')
         plt.show()
-
-    def plot_moving_average(self):
-        window_size = 30
-
-        plt.plot(self.iterations[window_size-1:], np.convolve(self.remaining_pegs, np.ones((window_size, ))/window_size, mode='valid'))
-        plt.xlabel('Episode')
-        plt.ylabel('Remaining pegs (smoothed)')
-        plt.show()
-
 
     def play_final_game(self, SAP_history):
         self.game = self.initialize_game()
@@ -80,7 +76,6 @@ class Player:
                 self.game.board.get_filled_cells(), action[0], action[1]
             )
 
-
     def play_game(self):
 
         wins = 0
@@ -90,7 +85,6 @@ class Player:
         for i in range(self.episodes):
 
             if i == self.episodes - 1:
-                print('Switched to following policy')
                 epsilon_greedy = False
 
             """ Reset all elegibilities to 0 """
@@ -170,7 +164,6 @@ class Player:
             # Update epsilon
             self.actor.epsilon = self.actor.epsilon * self.actor.epsilon_decay
 
-
             pegs = self.game.get_pegs()
             if pegs == 1:
                 print("--------------------win---------------------")
@@ -182,9 +175,10 @@ class Player:
 
         print('Number of wins: ', wins)
 
-        self.play_final_game(self.SAP_history)
+        if self.display_last_game:
+            self.play_final_game(self.SAP_history)
+
         self.plot_pegs()
-        self.plot_moving_average()
 
 
 def main():
@@ -194,3 +188,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
