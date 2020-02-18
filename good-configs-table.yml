@@ -6,7 +6,7 @@ board:
 
 game:
   type: Peg #Hex
-  open_positions: [[2,1]]
+  open_positions: [[3,1]]
 
 display:
   node_size: 1500
@@ -19,12 +19,12 @@ display:
 # |------------- Agent parameters -------------|
 
 RL_system:
-  episodes: 1200
+  episodes: 500
 
 critic:
-  type: NN #table or NN
+  type: table #table or NN
   dimensions: [15, 20, 30, 1] # Number of nodes in each layer
-  learning_rate: 0.001 # If NN is used, lr for critic should be much lower than for actor
+  learning_rate: 0.1 # If NN is used, lr for critic should be much lower than for actor
   eligibility_decay: 0.99 # Range [0,1]
   discount_factor: 0.99 # Range [0,1]
 
@@ -33,5 +33,4 @@ actor:
   eligibility_decay: 0.9 # Range [0,1]
   discount_factor: 0.9 # Range [0,1]
   init_epsilon: 1
-  epsilon_decay: 0.
-
+  epsilon_decay: 0.99

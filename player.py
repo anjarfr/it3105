@@ -166,9 +166,8 @@ class Player:
                 print("--------------------win---------------------")
                 wins += 1
 
-            print(i, ": ", pegs, ' pegs were left')
-            print("Epsilon: ", self.actor.epsilon)
-            print("TD error: ", TD_error)
+            print(i, ": ", pegs, ' pegs were left. Epsilon: ', self.actor.epsilon)
+            # print("TD error: ", TD_error)
             self.remaining_pegs.append(pegs)
             self.iterations.append(i)
 
