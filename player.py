@@ -61,7 +61,7 @@ class Player:
         plt.show()
 
     def plot_moving_average(self):
-        window_size = 30
+        window_size = 10
 
         plt.plot(self.iterations[window_size-1:], np.convolve(self.remaining_pegs, np.ones((window_size, ))/window_size, mode='valid'))
         plt.xlabel('Episode')
