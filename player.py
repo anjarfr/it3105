@@ -54,13 +54,13 @@ class Player:
             critic = NeuralNetCritic(cfg, self.game.board.generate_state())
         return critic
 
-    def plot_pegs(self):
+    def plot_result(self):
         window_size = min(cfg["display"]["plot_window_size"], int(self.episodes / 2))
 
         plt.figure()
-        plt.plot(self.iterations, self.remaining_pegs, color='b')
+        plt.plot(self.iterations, self.remaining_pegs, color='#638ed4')
         plt.plot(self.iterations[int(window_size/2):-int((window_size-1)/2)],
-                 np.convolve(self.remaining_pegs, np.ones((window_size,)) / window_size, mode='valid'), color='r')
+                 np.convolve(self.remaining_pegs, np.ones((window_size,)) / window_size, mode='valid'), color='#003182')
         plt.xlabel('Episode')
         plt.ylabel('Remaining pegs')
         plt.show()
@@ -192,8 +192,7 @@ class Player:
         if self.display_last_game:
             self.play_final_game(self.SAP_history)
 
-        self.play_final_game(self.SAP_history)
-        self.plot_pegs()
+        self.plot_result()
 
 
 def main():
