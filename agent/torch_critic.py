@@ -7,7 +7,7 @@ torch.manual_seed(42)
 class NeuralNetCritic(Critic):
 
     def __init__(self, cfg, init_state):
-        super(TorchCritic, self).__init__(cfg)
+        super(NeuralNetCritic, self).__init__(cfg)
         self.model = TorchNet(cfg, init_state)
 
     def calculate_TD_error(self, state, succ_state, reward):
