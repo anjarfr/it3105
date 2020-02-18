@@ -1,8 +1,8 @@
 # |---------- Environment parameters ----------|
 
 board:
-  size: 5
-  shape: triangle #diamond
+  size: 4
+  shape: diamond #diamond
 
 game:
   type: Peg #Hex
