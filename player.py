@@ -3,7 +3,7 @@ import yaml
 
 from agent.actor import Actor
 from agent.critic import Critic
-from agent.torch_critic import TorchCritic
+from agent.torch_critic import NeuralNetCritic
 from environment.game import Peg, Hex
 from environment.visualizer import Visualizer
 import numpy as np
@@ -50,7 +50,7 @@ class Player:
             critic = Critic(cfg)
         if critic_type == "nn" or critic_type == "NN":
             self.table_critic = False
-            critic = TorchCritic(cfg, self.game.board.generate_state())
+            critic = NeuralNetCritic(cfg, self.game.board.generate_state())
         return critic
 
     def plot_pegs(self):

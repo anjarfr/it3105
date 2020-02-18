@@ -1,5 +1,3 @@
-
-
 class Critic:
     """
     Receive SARSA from player
@@ -63,4 +61,3 @@ class Critic:
         self.value_function[state] += (
                 self.learning_rate * TD_error * self.eligibility[state]
         )
-

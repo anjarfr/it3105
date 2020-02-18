@@ -4,8 +4,7 @@ from .critic import Critic
 
 torch.manual_seed(42)
 
-
-class TorchCritic(Critic):
+class NeuralNetCritic(Critic):
 
     def __init__(self, cfg, init_state):
         super(TorchCritic, self).__init__(cfg)

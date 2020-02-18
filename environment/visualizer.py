@@ -129,7 +129,6 @@ class Visualizer:
             edgecolors="black",
         )
 
-
         plt.axis("off")
         plt.show()
         plt.pause(self.delay)
