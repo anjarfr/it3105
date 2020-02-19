@@ -1,9 +1,9 @@
 class Critic:
     """
-    Receive SARSA from player
+    Receive state from player
     Calculate TD error
     Update value function
-    Send TD error to actor
+    Send TD error to player
     """
 
     def __init__(self, cfg):
