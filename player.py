@@ -102,7 +102,7 @@ class Player:
     def get_reward_and_succ_state(self, state, action):
         """
         Perform action from state s and bring the game to state s'
-        Updates the critic's value function if critic is a table
+        Initializes the critic's value function if critic is a table
         Returns the reward received and successor state
         """
 
@@ -163,7 +163,7 @@ class Player:
     def play_game(self):
         for i in range(self.episodes):
 
-            if i == self.episodes - 1:
+            if i == self.episodes - 1: #If final episode
                 print('Switched to following policy')
                 self.epsilon_greedy = False
 
@@ -176,7 +176,7 @@ class Player:
             state = init_state  # String
             action = init_action  # Tuple of tuple
 
-            """ Play game until termination """
+            """ Play game until termination, a.k.a. one episode """
             while not self.game.is_finished():
 
                 reward, succ_state = self.get_reward_and_succ_state(state, action)
@@ -186,7 +186,7 @@ class Player:
                 """ Compute TD error """
                 TD_error = self.critic.calculate_TD_error(state, succ_state, reward)
 
-                """ Update the eligibility traces for the path taken up to this point """
+                """ Update the eligibility traces, value function and policy for the path taken up to this point """
                 self.update_eligibility_traces(reward, TD_error, succ_state)
 
                 state = succ_state
