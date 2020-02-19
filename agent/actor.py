@@ -57,6 +57,7 @@ class Actor:
         """
 
         greedy_number = random.uniform(0, 1)
+        chosen_action = None
 
         if len(actions) > 0:
             chosen_action = next(iter(actions))
