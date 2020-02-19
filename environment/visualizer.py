@@ -25,12 +25,6 @@ class Visualizer:
         self.node_sizes = self.node_size
         self.graph = self.initialize_graph()
 
-    def create_display_range(self, ranges):
-        display_range = []
-        for r in ranges:
-            display_range.extend(range(r[0], r[1]))
-        return display_range
-
     def get_nodes(self):
         """ Get the coordinates of all the cells on the board """
 
