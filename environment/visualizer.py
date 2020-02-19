@@ -89,8 +89,8 @@ class Visualizer:
         """
         Takes in a list of node coordinates
         and colors them with the selected
-        filled node color. Display the new
-        board state
+        filled node color, and sets size.
+        Display the new board state
         """
         self.node_colors = self.initialize_colors()
         filled_indexes = [self.nodes.index(node) for node in filled_nodes]
