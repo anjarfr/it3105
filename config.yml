@@ -1,8 +1,8 @@
 # |---------- Environment parameters ----------|
 
 board:
-  size: 4
-  shape: diamond #diamond or triangle
+  size: 5
+  shape: triangle #diamond or triangle
 
 game:
   type: Peg #Hex
@@ -37,4 +37,4 @@ actor:
   eligibility_decay: 0.9 # b0.9
   discount_factor: 0.9 # b0.9
   init_epsilon: 1 # b1
-  epsilon_decay: 0.99 # t0.99 for 500, n0.995
+  epsilon_decay: 0.99 # t0.99 for 500, n0.995 for 1500

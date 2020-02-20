@@ -60,14 +60,14 @@ class Actor:
         chosen_action = None
 
         if len(actions) > 0:
-            chosen_action = next(iter(actions))
+            chosen_action = actions[0]
             if epsilon_greedy:
                 if greedy_number < self.epsilon:
                     random_index = random.randint(0, len(actions) - 1)
                     chosen_action = actions[random_index]
                     return chosen_action
 
-            best = self.policy[(state, next(iter(actions)))]
+            best = self.policy[(state, actions[0])]
             for action in actions:
                 if self.policy[(state, action)] >= best:
                     best = self.policy[(state, action)]
