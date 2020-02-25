@@ -4,6 +4,7 @@ from .critic import Critic
 
 torch.manual_seed(42)
 
+
 class NeuralNetCritic(Critic):
 
     def __init__(self, cfg, init_state):
@@ -77,7 +78,7 @@ class TorchNet(nn.Module):
     def update(self, prediction, target):
         """ Modify the gradients in the neural network to incorporate eligibility traces """
         loss = self.loss_func(prediction, target)
-        self.zero_grad()
+        self.zero_grad() # Clears gradients
         loss.backward(retain_graph=True)
 
         with torch.no_grad():

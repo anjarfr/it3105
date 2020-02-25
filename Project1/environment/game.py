@@ -1,5 +1,5 @@
 import yaml
-from environment.board import Triangle, Diamond
+from Project1.environment.board import Triangle, Diamond
 
 with open("config.yml", "r") as ymlfile:
     cfg = yaml.load(ymlfile, Loader=yaml.FullLoader)
